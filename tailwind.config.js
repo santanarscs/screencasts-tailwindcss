@@ -21,5 +21,7 @@ module.exports = {
       fontSize: ['hover']
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
