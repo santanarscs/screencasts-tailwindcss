@@ -23,7 +23,7 @@ export function ActiveLink({children, shouldMathExactHref = false, ...rest}: Act
   return (
     <Link {...rest}>
       {cloneElement(children, {
-        className: isActive ? cx(children.props.className, 'text-blue-500') : cx(children.props.className, 'text-gray-800') 
+        className: isActive ? cx(children.props.className, 'text-blue-500') : cx(children.props.className, 'text-gray-600') 
       })}
     </Link>
   )
