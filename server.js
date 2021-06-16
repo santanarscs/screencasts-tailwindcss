@@ -13,7 +13,7 @@ module.exports = () => {
   for (let i = 1; i < 100; i++) {
     data.schedules.push({
       id: i,
-      name:`Titulo - ${i}`,
+      title:`Titulo - ${i}`,
       description: `Descrição - ${i}`,
       repeat: repeats[Math.floor(Math.random() * 3)],
       terms: terms[Math.floor(Math.random() * 4)]
