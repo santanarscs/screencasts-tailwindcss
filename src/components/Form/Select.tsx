@@ -19,6 +19,8 @@ const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = ({n
     <div className="w-full">
       {!!label && <label htmlFor={name} className="text-gray-600 tracking-wide">{label}</label>}
       <select 
+        name={name}
+        id={name}
         className="w-full rounded-md my-1 px-2 py-3 bg-gray-200 border-none"
         ref={ref} 
         {...rest} 
