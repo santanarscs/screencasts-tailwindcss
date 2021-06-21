@@ -1,17 +1,18 @@
 import { Sidebar } from "../../components/Sidebar";
-import { PlusIcon } from '@heroicons/react/outline'
+import { PlusIcon, PencilIcon, XIcon, EyeIcon } from '@heroicons/react/outline'
 import NextLink from 'next/link'
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
-import { GetServerSideProps } from "next";
 import { useSchedules } from "../../services/hooks/useSchedule";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 type Schedule = {
   id: string;
   title: string;
   repeat: string;
   terms: string[];
+  active: boolean
 }
 
 type ScheduleListProps = {
@@ -20,8 +21,20 @@ type ScheduleListProps = {
 
 
 export default function ScheduleList({schedules}: ScheduleListProps) {
+  const router = useRouter()
   const [page, setPage] = useState(1)
   const {data, isLoading, error, isFetching, refetch} = useSchedules(page)
+
+  function handleEditSchedule(id: string) {
+    router.push(`/schedules/${id}/edit`)
+  }
+  function handleDetailSchedule(id: string) {
+    router.push(`/schedules/${id}/detail`)
+  }
+
+  function handleRemoveSchedule(id: string) {
+    console.log(id)
+  }
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -30,7 +43,7 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
         <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
           <div className="flex justify-between w-full items-center mb-8 ">
             <h1 className="text-2xl font-normal text-gray-600">
-              Agendamentos
+              Meus Agendamentos
             </h1>
             <NextLink href="/schedules/create" passHref>
               <a className=" flex justify-center items-center  py-2 px-3 rounded-md text-sm bg-brand text-white">
@@ -54,6 +67,8 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                   <th className="py-3 px-6 text-left">#</th>
                   <th className="py-3 px-6 text-left">Nome</th>
                   <th className="py-3 px-6 text-left">Repetição</th>
+                  <th className="py-3 px-6 text-center">Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm font-light">
@@ -62,6 +77,22 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.id}</td>
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.repeat}</td>
+                    <td className="py-3 px-6 text-center" >
+                      {schedule.active 
+                      ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
+                      : (<span className="bg-gray-300 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
+                    </td>
+                    <td className="py-3 px-6 text-center flex space-x-1" >
+                      <button onClick={() => handleDetailSchedule(schedule.id)} className="flex justify-center items-center  bg-brand text-xs text-white rounded-md p-1">
+                        <EyeIcon className="h-3 w-3"/>
+                      </button>
+                      <button onClick={() => handleEditSchedule(schedule.id)} className="flex justify-center items-center  bg-blue-500 text-xs text-white rounded-md p-1">
+                        <PencilIcon className="h-3 w-3"/>
+                      </button>
+                      <button onClick={() => handleRemoveSchedule(schedule.id)} className=" flex justify-center items-center bg-red-400 text-xs text-white rounded-md p-1">
+                        <XIcon className="h-3 w-3"/>
+                      </button>
+                    </td>
                   </tr>
                 ))}
                 
