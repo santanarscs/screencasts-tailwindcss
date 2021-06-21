@@ -10,7 +10,7 @@ export function PaginationItem({isCurrent = false, number, onPageChange}: Pagina
 
   if(isCurrent) {
     return (
-      <button className="text-xs w-6 h-6 bg-blue-400 text-gray-200 rounded-md">
+      <button className="text-xs w-6 h-6 bg-brand text-gray-200 rounded-md">
         {number}
       </button>
     )
