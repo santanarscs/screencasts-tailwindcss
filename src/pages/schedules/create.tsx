@@ -11,28 +11,38 @@ import { useRouter } from "next/router";
 import { useMutation } from "react-query";
 import { Input } from "../../components/Form/Input";
 import { Select } from "../../components/Form/Select";
+import { InputTags } from "../../components/Form/InputTag";
+import { useState } from "react";
 
 
 type CreateScheduleFormData = {
   title: string;
-  description: string;
   repeat: string;
-  terms: string[];
+  terms: string[],
+  active: boolean,
 }
 
 const createScheduleFormSchema = yup.object().shape({
   title: yup.string().required('Nome obrigatório'),
-  description: yup.string().required('Descrição obrigatório'),
   repeat: yup.string().required('Repetição obrigatório'),
-  terms: yup.string().required('Termos obrigatório'),  
 })
 
 
 
 export default function CreateSchedule() {
+  
   const router = useRouter()
+
+  const [tags, setTags] = useState<string[]>([])
+
+  const options = [
+    {label: 'Diário', value:'daily'},
+    {label: 'Semanal', value: 'weekly' },
+    {label: 'Mensal', value: 'monthly'}
+  ]
+
   const createSchedule = useMutation(async (schedule: CreateScheduleFormData) => {
-    const response = await api.post('users', schedule)
+    const response = await api.post('schedules', schedule)
     return response.data;
   }, {
     onSuccess: () => {
@@ -40,15 +50,25 @@ export default function CreateSchedule() {
     }
   })
 
-  const { register, handleSubmit, formState} = useForm({
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(createScheduleFormSchema)
   })
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
-    await createSchedule.mutateAsync(values)
+    await createSchedule.mutateAsync({...values, active: true, terms: tags})
     router.push('/schedules')
   }
   const { errors } = formState
+
+  function handleAddTag(tag: string) {
+    setTags([...tags, tag])
+
+  }
+  function handleRemoveTag(index: number) {
+    const newTags = [...tags]
+    newTags.splice(index, 1)
+    setTags(newTags)
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -61,12 +81,11 @@ export default function CreateSchedule() {
               Novo Agendamento
             </h1>
           </div>
-          <form className="flex flex-1 flex-col space-y-3" onSubmit={handleSubmit(handleCreateSchedule)}>
+          <form className="flex flex-1 flex-col space-y-3" >
             <Input name="title" label="Nome" error={errors.title} {...register('title')} />
-            <Input name="description" label="Descrição" error={errors.description} {...register('description')} />
-            <Select name="repeat" label="Repetição" error={errors.repeat} {...register('repeat')} options={['daily','weekly', 'monthly']} />
-            <Input name="terms" label="Termos" error={errors.terms} {...register('terms')} />
-            <button type="submit" className="btn btn-primary">Salvar</button>
+            <Select name="repeat" label="Repetição" error={errors.repeat} {...register('repeat')} options={options} />
+            <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
+            <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
           </form>
         </div>
       </div>

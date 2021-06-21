@@ -2,11 +2,16 @@
 import { forwardRef, ForwardRefRenderFunction } from 'react'
 import { FieldError } from 'react-hook-form'
 
+export type SelectOptions = {
+  label: string;
+  value: string
+}
+
 interface SelectProps {
   name: string;
   label?: string;
   error?: FieldError;
-  options: string[] 
+  options: SelectOptions[] 
 }
 
 const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = ({name, label, error=null, options, ...rest}, ref) => {
@@ -18,9 +23,9 @@ const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = ({n
         ref={ref} 
         {...rest} 
       >
-        {options.map(value => (
-          <option key={value} value={value}>
-            {value}
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>
