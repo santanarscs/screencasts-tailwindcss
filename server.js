@@ -14,9 +14,9 @@ module.exports = () => {
     data.schedules.push({
       id: i,
       title:`Titulo - ${i}`,
-      description: `Descrição - ${i}`,
       repeat: repeats[Math.floor(Math.random() * 3)],
-      terms: terms[Math.floor(Math.random() * 4)]
+      terms: terms[Math.floor(Math.random() * 4)],
+      active: false
     })
   }
   return data

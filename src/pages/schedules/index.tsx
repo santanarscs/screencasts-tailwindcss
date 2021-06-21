@@ -10,7 +10,6 @@ import { useState } from "react";
 type Schedule = {
   id: string;
   title: string;
-  description: string;
   repeat: string;
   terms: string[];
 }
@@ -23,7 +22,6 @@ type ScheduleListProps = {
 export default function ScheduleList({schedules}: ScheduleListProps) {
   const [page, setPage] = useState(1)
   const {data, isLoading, error, isFetching, refetch} = useSchedules(page)
-  console.log(data)
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -35,7 +33,7 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
               Agendamentos
             </h1>
             <NextLink href="/schedules/create" passHref>
-              <a className=" flex justify-center items-center  py-2 px-3 rounded-md text-sm bg-blue-500 text-white">
+              <a className=" flex justify-center items-center  py-2 px-3 rounded-md text-sm bg-brand text-white">
                 <PlusIcon className="h-5 w-5 mr-2" />
                 <span className="uppercase">Criar novo</span>
               </a>
@@ -55,7 +53,6 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                 <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
                   <th className="py-3 px-6 text-left">#</th>
                   <th className="py-3 px-6 text-left">Nome</th>
-                  <th className="py-3 px-6 text-left">Descrição</th>
                   <th className="py-3 px-6 text-left">Repetição</th>
                 </tr>
               </thead>
@@ -64,7 +61,6 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                   <tr key={schedule.id} className="border-b border-gray-200 hover:bg-gray-200">
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.id}</td>
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
-                    <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.description}</td>
                     <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.repeat}</td>
                   </tr>
                 ))}
