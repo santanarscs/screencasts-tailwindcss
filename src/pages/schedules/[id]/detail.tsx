@@ -1,10 +1,13 @@
-import { PlusIcon, PencilIcon, XIcon, EyeIcon } from '@heroicons/react/outline'
 import NextLink from 'next/link'
 import { Header } from "../../../components/Header";
 import { Sidebar } from "../../../components/Sidebar";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
 import { api } from '../../../services/api';
+import { useMutation } from 'react-query';
+import { queryClient } from '../../../services/queryClient';
+import { useState } from 'react';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 
 type Schedule = {
   id: string;
@@ -18,19 +21,46 @@ type ScheduleDetailProps = {
   schedule: Schedule
 }
 
-
 export default function DetailSchedule({schedule}: ScheduleDetailProps) {
   const router = useRouter()
+
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+
+  const updateSchedule = useMutation(async (data: Schedule) => {
+    await api.put(`/schedules/${schedule.id}`, data)
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('schedules')
+    }
+  })
+
+  const removeSchedule = useMutation(async (schedule: Schedule) => {
+    await api.delete(`schedules/${schedule.id}`)
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('schedules')
+    }
+  })
+   
+  async function handleActiveSchedule() {
+    await updateSchedule.mutateAsync({...schedule, active: true})
+    router.push('/schedules')
+  }
+
+  async function handleDesactiveSchedule() {
+    await updateSchedule.mutateAsync({...schedule, active: false})
+    router.push('/schedules')
+  }
+  async function handleRemoveSchedule() {
+    await removeSchedule.mutateAsync(schedule)
+    setIsOpenModal(false)
+    router.push('/schedules')
+  }
+
+  function openModalConfirm() {
+    setIsOpenModal(true)
+  }
  
-  function handleRemoveSchedule(id: string) {
-    console.log(id)
-  }
-  function handleActiveSchedule(id: string) {
-    console.log('Active', id)
-  }
-  function handleDesactiveSchedule(id: string) {
-    console.log('Desactive', id)
-  }
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -49,17 +79,17 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
               </NextLink>
              {schedule.active 
              ? (
-              <button onClick={() => handleDesactiveSchedule(schedule.id)} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-gray-300 text-gray-700">
+              <button onClick={handleDesactiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-gray-300 text-gray-700">
                 Desativar
               </button>
              )
              : (
-              <button onClick={() => handleActiveSchedule(schedule.id)} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-green-500 text-white">
+              <button onClick={handleActiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-green-500 text-white">
                 Ativar
               </button>
              )
              }
-              <button onClick={() => handleRemoveSchedule(schedule.id)} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-red-400 text-white">
+              <button onClick={openModalConfirm} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-red-400 text-white">
                 Remover
               </button>
             </div>
@@ -77,6 +107,13 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
           
         </div>
       </div>
+      <ConfirmModal
+        title="Tem certeza desta ação?"
+        isOpen={isOpenModal}
+        handleCloseModal={() => setIsOpenModal(false)}
+        handleConfirmModal={handleRemoveSchedule}
+        text="Deseja remover este item do banco de dados?"
+      />
     </div>
   )
 }

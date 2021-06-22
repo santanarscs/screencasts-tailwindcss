@@ -4,9 +4,8 @@ import NextLink from 'next/link'
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { useSchedules } from "../../services/hooks/useSchedule";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
-import { Dialog, Transition } from '@headlessui/react'
 import { ConfirmModal } from "../../components/ConfirmModal";
 import { useMutation } from "react-query";
 import { api } from "../../services/api";
