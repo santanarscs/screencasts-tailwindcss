@@ -4,8 +4,13 @@ import NextLink from 'next/link'
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { useSchedules } from "../../services/hooks/useSchedule";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useRouter } from "next/router";
+import { Dialog, Transition } from '@headlessui/react'
+import { ConfirmModal } from "../../components/ConfirmModal";
+import { useMutation } from "react-query";
+import { api } from "../../services/api";
+import { queryClient } from "../../services/queryClient";
 
 type Schedule = {
   id: string;
@@ -23,7 +28,17 @@ type ScheduleListProps = {
 export default function ScheduleList({schedules}: ScheduleListProps) {
   const router = useRouter()
   const [page, setPage] = useState(1)
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const {data, isLoading, error, isFetching, refetch} = useSchedules(page)
+
+  const removeSchedule = useMutation(async (schedule: Schedule) => {
+    await api.delete(`schedules/${schedule.id}`)
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('schedules')
+    }
+  })
 
   function handleEditSchedule(id: string) {
     router.push(`/schedules/${id}/edit`)
@@ -32,9 +47,15 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
     router.push(`/schedules/${id}/detail`)
   }
 
-  function handleRemoveSchedule(id: string) {
-    console.log(id)
+  function openModalConfirm(data: Schedule) {
+    setSelectedSchedule(data)
+    setIsOpenModal(true)
   }
+  async function handleRemoveSchedule() {
+    await removeSchedule.mutateAsync(selectedSchedule)
+    setIsOpenModal(false)
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -89,7 +110,7 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                       <button onClick={() => handleEditSchedule(schedule.id)} className="flex justify-center items-center  bg-blue-500 text-xs text-white rounded-md p-1">
                         <PencilIcon className="h-3 w-3"/>
                       </button>
-                      <button onClick={() => handleRemoveSchedule(schedule.id)} className=" flex justify-center items-center bg-red-400 text-xs text-white rounded-md p-1">
+                      <button onClick={() => openModalConfirm(schedule)} className=" flex justify-center items-center bg-red-400 text-xs text-white rounded-md p-1">
                         <XIcon className="h-3 w-3"/>
                       </button>
                     </td>
@@ -107,6 +128,13 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
           )}
         </div>
       </div>
+      <ConfirmModal
+        title="Tem certeza desta ação?"
+        isOpen={isOpenModal}
+        handleCloseModal={() => setIsOpenModal(false)}
+        handleConfirmModal={handleRemoveSchedule}
+        text="Deseja remover este item do banco de dados?"
+      />
     </div>
   )
 }
