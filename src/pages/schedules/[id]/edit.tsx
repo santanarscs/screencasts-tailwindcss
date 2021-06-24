@@ -1,6 +1,3 @@
-import { Header } from "../../../components/Header";
-import { Sidebar } from "../../../components/Sidebar";
-
 import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -13,6 +10,8 @@ import { Select } from "../../../components/Form/Select";
 import { InputTags } from "../../../components/Form/InputTag";
 import { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
+import { withSSRAuth } from "../../../utils/withSSRAuth";
+import { DefaultLayoutComponent } from "../../../components/DefaultLayout";
 
 type Schedule = {
   id: string;
@@ -90,33 +89,29 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <div className="flex w-full my-6 mx-auto px-6 max-w-screen-2xl">
-        <Sidebar />
-        <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
-          <div className="flex justify-between w-full items-center mb-8 ">
-            <h1 className="text-2xl font-normal text-gray-600">
-              Novo Agendamento
-            </h1>
-          </div>
-          <form className="flex flex-1 flex-col space-y-3" >
-            <Input name="title" label="Nome" error={errors.title} {...register('title')} />
-            <Select name="repeat" label="Repetição" error={errors.repeat} {...register('repeat')} options={options} />
-            <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
-            <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
-          </form>
+    <DefaultLayoutComponent>
+      <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
+        <div className="flex justify-between w-full items-center mb-8 ">
+          <h1 className="text-2xl font-normal text-gray-600">
+            Novo Agendamento
+          </h1>
         </div>
+        <form className="flex flex-1 flex-col space-y-3" >
+          <Input name="title" label="Nome" error={errors.title} {...register('title')} />
+          <Select name="repeat" label="Repetição" error={errors.repeat} {...register('repeat')} options={options} />
+          <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
+          <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
+        </form>
       </div>
-    </div>
+    </DefaultLayoutComponent>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({params}) => {
+export const getServerSideProps: GetServerSideProps = withSSRAuth(async ({params}) => {
   const { id } = params;
   const response = await api.get(`/schedules/${id}`)
   const schedule = response.data
   return {
     props: { schedule }
   }
-}
+})
