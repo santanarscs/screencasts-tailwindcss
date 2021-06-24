@@ -7,7 +7,7 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   return (
-    <aside className="w-64 mr-8">
+    <aside className="w-64">
       <SidebarNav />
     </aside>
   )

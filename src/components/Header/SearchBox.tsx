@@ -7,7 +7,7 @@ export function SearchBox() {
   
   
   return (
-    <label className="flex py-4 px-8 ml-6 max-w-md self-center text-gray-400 relative bg-gray-200 rounded-md" >
+    <label className="invisible flex py-4 px-8 max-w-md self-center text-gray-400 relative bg-gray-200 rounded-md lg:visible " >
       <input 
         className="bg-gray-200 px-4 mr-4 outline-none text-gray-700"
         placeholder="Buscar na plataforma"
