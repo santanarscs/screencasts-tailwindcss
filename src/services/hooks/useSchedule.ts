@@ -6,7 +6,7 @@ export type Schedule = {
   name: string;
   description: string;
   repeat: string;
-  terms: string[];
+  tags: string[];
 }
 
 type GetSchedulesResponse = {
@@ -18,15 +18,14 @@ const TEN_MINUTES_IN_MILLISECONDS = 1000 * 60 * 10;
 
 export async function getSchedules(page: number): Promise<GetSchedulesResponse> {
   
-  const {data, headers} = await api.get('/schedules', {
+  const { data } = await api.get('/schedules', {
     params: {
-      '_page': page,
-      '_limit': 10
+      'page': page,
+      'limit': 10
     }
   })
+  const [schedules, totalCount] = data
 
-  const totalCount = Number(headers['x-total-count'])
-  const schedules = data
   return { schedules, totalCount }
 }
 
