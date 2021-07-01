@@ -12,10 +12,13 @@ import { InputTags } from "../../components/Form/InputTag";
 import { useState } from "react";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
+import { useUser } from '../../services/hooks/useUser';
 
 
 type CreateScheduleFormData = {
   title: string;
+  target:  string;
+  owner_id: string;
   type_schedule: string;
   tags: string[],
   active: boolean,
@@ -23,7 +26,8 @@ type CreateScheduleFormData = {
 
 const createScheduleFormSchema = yup.object().shape({
   title: yup.string().required('Nome obrigatório'),
-  type_schedule: yup.string().required('Repetição obrigatório'),
+  type_schedule: yup.string().required('Tipo é obrigatório'),
+  target: yup.string().required('Alvo é obrigatório')
 })
 
 
@@ -34,10 +38,16 @@ export default function CreateSchedule() {
 
   const [tags, setTags] = useState<string[]>([])
 
+  const { id } = useUser()
   const options = [
     {label: 'Diário', value:'daily'},
     {label: 'Semanal', value: 'weekly' },
     {label: 'Mensal', value: 'monthly'}
+  ]
+  const targetOptions = [
+    {label: 'Câmara dos Deputados', value: 'camara_deputados'},
+    {label: 'Senado Federal', value: 'senado'},
+    {label: 'Diário Oficial da União', value: 'diario_oficial'},
   ]
 
   const createSchedule = useMutation(async (schedule: CreateScheduleFormData) => {
@@ -54,7 +64,12 @@ export default function CreateSchedule() {
   })
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
-    await createSchedule.mutateAsync({...values, active: true, terms: tags})
+    await createSchedule.mutateAsync({
+      ...values, 
+      active: true, 
+      owner_id: id,
+      tags
+    })
     router.push('/schedules')
   }
   const { errors } = formState
@@ -80,6 +95,7 @@ export default function CreateSchedule() {
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="title" label="Nome" error={errors.title} {...register('title')} />
           <Select name="type_schedule" label="Tipo" error={errors.type_schedule} {...register('type_schedule')} options={options} />
+          <Select name="target" label="Alvo" error={errors.target} {...register('target')} options={targetOptions} />
           <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
