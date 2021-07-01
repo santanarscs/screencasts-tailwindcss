@@ -25,7 +25,7 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
   const router = useRouter()
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-
+  const [isLoadingRunJob, setIsLoadingRunJob] = useState<boolean>(false)
   const updateSchedule = useMutation(async (data: Schedule) => {
     await api.put(`/schedules/${schedule.id}`, data)
   }, {
@@ -41,6 +41,14 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
       queryClient.invalidateQueries('schedules')
     }
   })
+
+  async function handleRunJob() {
+    setIsLoadingRunJob(true)
+    await api.post('/jobs/once', {
+      schedule_id: schedule.id
+    })
+    setIsLoadingRunJob(false)
+  }
    
   async function handleActiveSchedule() {
     await updateSchedule.mutateAsync({...schedule, active: true})
@@ -74,6 +82,9 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
               Editar
             </a>
           </NextLink>
+          <button onClick={handleRunJob} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-purple-400 text-white">
+            {isLoadingRunJob ? 'Aguarde...' : 'Executar agora'}
+          </button>
           {schedule.active 
           ? (
           <button onClick={handleDesactiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-gray-300 text-gray-700">
