@@ -12,8 +12,8 @@ import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
 type Schedule = {
   id: string;
   title: string;
-  repeat: string;
-  terms: string[];
+  type_schedule: string;
+  tags: string[];
   active: boolean
 }
 
@@ -93,13 +93,13 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
       </div>
       <ul className="space-y-3">
         <li><strong className="mr-2">Nome:</strong>{schedule.title}</li>
-        <li><strong className="mr-2">Repetição:</strong>{schedule.repeat}</li>
+        <li><strong className="mr-2">Repetição:</strong>{schedule.type_schedule}</li>
         <li>
         <strong className="mr-2">Status:</strong>{schedule.active 
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
                   : (<span className="bg-gray-300 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
         </li>
-        <li><strong className="mr-2">Termos:</strong>{schedule.terms.join(', ')}</li>
+        <li><strong className="mr-2">Termos:</strong>{schedule.tags.join(', ')}</li>
       </ul>
       
     </div>
@@ -118,6 +118,7 @@ export const getServerSideProps: GetServerSideProps = withSSRAuth(async ({params
   const { id } = params;
   const response = await api.get(`/schedules/${id}`)
   const schedule = response.data
+
   return {
     props: { schedule }
   }

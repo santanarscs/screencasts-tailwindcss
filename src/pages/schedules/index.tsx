@@ -14,7 +14,7 @@ import { withSSRAuth } from "../../utils/withSSRAuth";
 type Schedule = {
   id: string;
   title: string;
-  repeat: string;
+  type_schedule: string;
   terms: string[];
   active: boolean
 }
@@ -83,7 +83,7 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
               <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
                 <th className="py-3 px-6 text-left">#</th>
                 <th className="py-3 px-6 text-left">Nome</th>
-                <th className="py-3 px-6 text-left">Repetição</th>
+                <th className="py-3 px-6 text-left">Tipo</th>
                 <th className="py-3 px-6 text-center">Status</th>
                 <th></th>
               </tr>
@@ -93,7 +93,7 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
                 <tr key={schedule.id} className="border-b border-gray-200 hover:bg-gray-200">
                   <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.id}</td>
                   <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
-                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.repeat}</td>
+                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.type_schedule}</td>
                   <td className="py-3 px-6 text-center" >
                     {schedule.active 
                     ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 

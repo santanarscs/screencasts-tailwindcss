@@ -16,14 +16,14 @@ import { DefaultLayoutComponent } from "../../../components/DefaultLayout";
 type Schedule = {
   id: string;
   title: string;
-  repeat: string;
+  type_schedule: string;
   terms: string[];
   active: boolean
 }
 
 type CreateScheduleFormData = {
   title: string;
-  repeat: string;
+  type_schedule: string;
   terms: string[],
   active: boolean,
 }
@@ -34,7 +34,7 @@ type ScheduleEditProps = {
 
 const createScheduleFormSchema = yup.object().shape({
   title: yup.string().required('Nome obrigatório'),
-  repeat: yup.string().required('Repetição obrigatório'),
+  type_schedule: yup.string().required('Repetição obrigatório'),
 })
 
 
@@ -98,7 +98,7 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="title" label="Nome" error={errors.title} {...register('title')} />
-          <Select name="repeat" label="Repetição" error={errors.repeat} {...register('repeat')} options={options} />
+          <Select name="type_schedule" label="Repetição" error={errors.type_schedule} {...register('type_schedule')} options={options} />
           <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
