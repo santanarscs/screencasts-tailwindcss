@@ -10,6 +10,7 @@ import { api } from "../../services/api";
 import { queryClient } from "../../services/queryClient";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
+import { getSession } from 'next-auth/client';
 
 type Schedule = {
   id: string;
@@ -21,15 +22,16 @@ type Schedule = {
 
 type ScheduleListProps = {
   schedules: Schedule[]
+  owner_id: string;
 }
 
 
-export default function ScheduleList({schedules}: ScheduleListProps) {
+export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
   const router = useRouter()
   const [page, setPage] = useState(1)
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-  const {data, isLoading, error, isFetching, refetch} = useSchedules(page)
+  const {data, isLoading, error, isFetching, refetch} = useSchedules(page, owner_id)
 
   const removeSchedule = useMutation(async (schedule: Schedule) => {
     await api.delete(`schedules/${schedule.id}`)
@@ -134,9 +136,12 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
   )
 }
 
-export const getServerSideProps = withSSRAuth(async (ctx) => {
+export const getServerSideProps = withSSRAuth(async ({req}) => {
+  const session = await getSession({req})
+
   return {
     props: {
+      owner_id: session.sub
     }
   }
 })

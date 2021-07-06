@@ -9,11 +9,16 @@ import { ConfirmModal } from '../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
 
+type Tag = {
+  id: string;
+  name: string;
+}
+
 type Schedule = {
   id: string;
   title: string;
   type_schedule: string;
-  tags: string[];
+  tags: Tag[];
   active: boolean
 }
 
@@ -99,7 +104,7 @@ export default function DetailSchedule({schedule}: ScheduleDetailProps) {
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
                   : (<span className="bg-gray-300 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
         </li>
-        <li><strong className="mr-2">Termos:</strong>{schedule.tags.join(', ')}</li>
+        <li><strong className="mr-2">Termos:</strong>{schedule.tags.map(tag => tag.name).join(', ')}</li>
       </ul>
       
     </div>

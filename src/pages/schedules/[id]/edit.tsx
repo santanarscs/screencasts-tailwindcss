@@ -13,12 +13,17 @@ import { GetServerSideProps } from "next";
 import { withSSRAuth } from "../../../utils/withSSRAuth";
 import { DefaultLayoutComponent } from "../../../components/DefaultLayout";
 
+type Tag = {
+  id: string;
+  name: string;
+}
+
 type Schedule = {
   id: string;
   title: string;
   type_schedule: string;
   target: string;
-  tags: string[];
+  tags: Tag[];
   active: boolean
 }
 
@@ -47,7 +52,7 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
 
   const [tags, setTags] = useState<string[]>(() => {
     if(schedule.tags){
-      return schedule.tags
+      return schedule.tags.map(tag => tag.name)
     }
     return [] 
   })
@@ -91,9 +96,17 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
     setTags([...tags, tag])
 
   }
-  function handleRemoveTag(index: number) {
+  async function handleRemoveTag(index: number) {
+    const tag_id = schedule.tags.find(tag => tag.name === tags[index]).id
+
+    if(tag_id) {
+      await api.delete(`/tags/${tag_id}`)
+    }
+    
     const newTags = [...tags]
+    
     newTags.splice(index, 1)
+
     setTags(newTags)
   }
 
