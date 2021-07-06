@@ -1,17 +1,20 @@
-import { useKeycloak } from '@react-keycloak/ssr'
-import { KeycloakInstance } from 'keycloak-js'
 import { useRouter } from 'next/router'
+import { signIn, signOut, useSession } from 'next-auth/client'
+
 export default function Index(){
   const router = useRouter()
-  const { keycloak, initialized } = useKeycloak<KeycloakInstance>()
+  const [session, triggerEvent] = useSession()
 
-  if (keycloak && initialized && !keycloak.authenticated && keycloak.createLoginUrl) {
-    keycloak.login()
-  }
-  if(keycloak && keycloak.authenticated) {
+  if(!triggerEvent && !session) {
+    signIn('keycloak')
+  } 
+
+  if(!triggerEvent && session) {
     router.push('/dashboard')
   }
   return (
-    <div>Você será redirecionado...</div>
+    <div>
+      Você será redirecionado...
+    </div>
   )
 }
