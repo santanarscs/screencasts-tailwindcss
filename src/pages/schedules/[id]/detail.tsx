@@ -86,14 +86,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
     }
   })
 
-  async function handleRunJob() {
-    setIsLoadingRunJob(true)
-    await api.post('/jobs/once', {
-      schedule_id: schedule.id
-    })
-    setIsLoadingRunJob(false)
-  }
-   
   async function handleActiveSchedule() {
     await updateSchedule.mutateAsync({...schedule, active: true})
     router.push('/schedules')
@@ -135,7 +127,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
             </a>
           </NextLink>
           <button onClick={handleRunJob} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-purple-400 text-white">
-            {isLoadingRunJob ? 'Aguarde...' : 'Executar agora'}
+            {isLoading ? 'Aguarde...' : 'Executar agora'}
           </button>
           {schedule.active 
           ? (
