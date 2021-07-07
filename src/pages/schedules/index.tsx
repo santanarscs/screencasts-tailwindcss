@@ -10,6 +10,7 @@ import { api } from "../../services/api";
 import { queryClient } from "../../services/queryClient";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
+import { getSession } from 'next-auth/client';
 
 type Schedule = {
   id: string;
@@ -21,15 +22,16 @@ type Schedule = {
 
 type ScheduleListProps = {
   schedules: Schedule[]
+  owner_id: string;
 }
 
 
-export default function ScheduleList({schedules}: ScheduleListProps) {
+export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
   const router = useRouter()
   const [page, setPage] = useState(1)
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-  const {data, isLoading, error, isFetching, refetch} = useSchedules(page)
+  const {data, isLoading, error, isFetching, refetch} = useSchedules(page, owner_id)
 
   const removeSchedule = useMutation(async (schedule: Schedule) => {
     await api.delete(`schedules/${schedule.id}`)
@@ -81,7 +83,6 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
           <table className="min-w-max w-full table-auto">
             <thead>
               <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">#</th>
                 <th className="py-3 px-6 text-left">Nome</th>
                 <th className="py-3 px-6 text-left">Tipo</th>
                 <th className="py-3 px-6 text-center">Status</th>
@@ -91,7 +92,6 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
             <tbody className="text-gray-600 text-sm font-light">
               {data.schedules.map(schedule => (
                 <tr key={schedule.id} className="border-b border-gray-200 hover:bg-gray-200">
-                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.id}</td>
                   <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
                   <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.type_schedule}</td>
                   <td className="py-3 px-6 text-center" >
@@ -134,9 +134,12 @@ export default function ScheduleList({schedules}: ScheduleListProps) {
   )
 }
 
-export const getServerSideProps = withSSRAuth(async (ctx) => {
+export const getServerSideProps = withSSRAuth(async ({req}) => {
+  const session = await getSession({req})
+
   return {
     props: {
+      owner_id: session.sub
     }
   }
 })

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
 import { useUser } from '../../services/hooks/useUser';
+import { useSession } from 'next-auth/client';
 
 
 type CreateScheduleFormData = {
@@ -36,9 +37,10 @@ export default function CreateSchedule() {
   
   const router = useRouter()
 
+  const [session] = useSession()
+
   const [tags, setTags] = useState<string[]>([])
 
-  const { id } = useUser()
   const options = [
     {label: 'Diário', value:'daily'},
     {label: 'Semanal', value: 'weekly' },
@@ -67,7 +69,7 @@ export default function CreateSchedule() {
     await createSchedule.mutateAsync({
       ...values, 
       active: true, 
-      owner_id: id,
+      owner_id: session?.sub as string,
       tags
     })
     router.push('/schedules')
