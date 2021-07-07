@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
+import { Chart } from '../../../components/Chart';
 
 type Tag = {
   id: string;
@@ -49,6 +50,12 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   const router = useRouter()
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const [series, setSeries] = useState(() => {
+    return jobs.map(job => job.items.length)
+  })
+  const [categories, setCategories] = useState(() => {
+    return jobs.map(job => job.date_job)
+  })
 
   const updateSchedule = useMutation(async (data: Schedule) => {
     await api.put(`/schedules/${schedule.id}`, data)
@@ -132,8 +139,20 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
                   : (<span className="bg-gray-300 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
         </li>
-        <li><strong className="mr-2">Termos:</strong>{schedule.tags.map(tag => tag.name).join(', ')}</li>
+        <li><strong className="mr-2">Termos:</strong>
+          <div className="space-x-2 mt-2">
+            {schedule.tags.map(tag => ( <span className="py-1 px-2 bg-gray-300 rounded-md text-sm"  key={tag.id}>{tag.name}</span>))}
+          </div>
+        </li>
       </ul>
+    </div>
+    <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
+      <div className="flex justify-between w-full items-center mb-8 ">
+        <h1 className="text-2xl font-normal text-gray-600">
+          Últimos trabalhos
+        </h1>
+      </div>
+      <Chart categories={categories} data={series} />
     </div>
 
     {jobs.map(job => (
@@ -143,26 +162,26 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
             Trabalho execuado em {job.date_job}
           </h1>
         </div>
-        <table>
+        <table className="table-fixed text-sm">
           <thead>
             <tr>
-              <th>Número</th>
-              <th>Tipo</th>
-              <th>Data de Apresentação</th>
-              <th>Ementa</th>
-              <th>Autor</th>
-              <th>Status</th>
+              <th className="text-left py-1 px-2 w-1/12">Número</th>
+              <th className="text-left py-1 px-2 w-1/12">Tipo</th>
+              <th className="text-left py-1 px-2 w-1/4">Apresentação</th>
+              <th className="text-left py-1 px-2 w-1/2">Ementa</th>
+              <th className="text-left py-1 px-2 w-1/5">Autor</th>
+              <th className="text-left py-1 px-2 w-1/4">Status</th>
             </tr>
           </thead>
           <tbody>
             {job.items.map(item => (
               <tr key={item.id}>
-                <td>{item.proposition_id}</td>
-                <td>{item.type_proposition}</td>
-                <td>{item.date_apresentation}</td>
-                <td>{item.text}</td>
-                <td>{item.author}</td>
-                <td>{item.status}</td>
+                <td className="text-left py-1 px-2">{item.proposition_id}</td>
+                <td className="text-left py-1 px-2">{item.type_proposition}</td>
+                <td className="text-left py-1 px-2">{item.date_apresentation}</td>
+                <td className="text-left py-1 px-2">{item.text}</td>
+                <td className="text-left py-1 px-2">{item.author}</td>
+                <td className="text-left py-1 px-2">{item.status}</td>
               </tr>
             ))}
           </tbody>
