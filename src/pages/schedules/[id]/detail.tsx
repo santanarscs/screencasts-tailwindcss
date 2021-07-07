@@ -2,7 +2,7 @@ import NextLink from 'next/link'
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
 import { api } from '../../../services/api';
-import { useMutation } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { queryClient } from '../../../services/queryClient';
 import { useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
@@ -50,6 +50,19 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   const router = useRouter()
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+
+  async function fetchJobs() {
+    if(schedule.id) {
+      const { data } = await api.get(`/jobs/schedule/${schedule.id}`)
+      return data;
+    }
+    return []
+  }
+  const {data: jobsData, isLoading, error, refetch } = useQuery('jobs', fetchJobs, {
+    initialData: jobs
+  })
+
+
   const [series, setSeries] = useState(() => {
     return jobs.map(job => job.items.length)
   })
@@ -92,6 +105,8 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
     await api.post('/jobs/once',  {
       schedule_id: schedule.id
     })
+    await refetch()
+    console.log(jobsData)
   }
 
   function openModalConfirm() {
@@ -124,7 +139,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
           )
           }
           <button onClick={handleRunJob} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-purple-400 text-white">
-            Executar
+            {isLoading ? 'Executando...' : 'Executar'}
           </button>
           <button onClick={openModalConfirm} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-red-400 text-white">
             Remover
@@ -155,7 +170,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
       <Chart categories={categories} data={series} />
     </div>
 
-    {jobs.map(job => (
+    {jobsData.map(job => (
       <div key={job.id} className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
         <div className="flex justify-between w-full items-center mb-8 ">
           <h1 className="text-2xl font-normal text-gray-600">

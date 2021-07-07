@@ -11,8 +11,6 @@ type ChartProps = {
 }
 
 export function Chart({categories, data}: ChartProps) {
-  console.log(categories)
-  console.log(data)
   const options: ApexOptions = {
     chart: {
       toolbar: { show: false },
