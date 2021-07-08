@@ -12,7 +12,7 @@ export default NextAuth({
       accessTokenUrl: `${process.env.KEYCLOAK_BASE_URL}/token`,
       requestTokenUrl: `${process.env.KEYCLOAK_BASE_URL}/auth`,
       authorizationUrl: `${process.env.KEYCLOAK_BASE_URL}/auth?response_type=code`,
-      clientId: "cigeo",
+      clientId: "monitor",
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
       profileUrl: `${process.env.KEYCLOAK_BASE_URL}/userinfo`,
       async profile(profile) {
