@@ -16,6 +16,7 @@ type Schedule = {
   id: string;
   title: string;
   type_schedule: string;
+  type_scheduleDescription?: string;
   terms: string[];
   active: boolean
 }
@@ -32,6 +33,7 @@ export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const {data, isLoading, error, isFetching, refetch} = useSchedules(page, owner_id)
+  console.log(data)
 
   const removeSchedule = useMutation(async (schedule: Schedule) => {
     await api.delete(`schedules/${schedule.id}`)
@@ -93,7 +95,7 @@ export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
               {data.schedules.map(schedule => (
                 <tr key={schedule.id} className="border-b border-gray-200 hover:bg-gray-200">
                   <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
-                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.type_schedule}</td>
+                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.type_scheduleDescription}</td>
                   <td className="py-3 px-6 text-center" >
                     {schedule.active 
                     ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 

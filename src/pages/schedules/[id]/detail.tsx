@@ -19,6 +19,7 @@ type Schedule = {
   id: string;
   title: string;
   type_schedule: string;
+  type_scheduleDescription?: string;
   tags: Tag[];
   active: boolean
 }
@@ -46,6 +47,12 @@ type ScheduleDetailProps = {
   jobs: Job[]
 }
 
+const acceptedTypeSchedule = {
+  'daily': 'Diário',
+  'weekly': 'Semanal',
+  'monthly': 'Mensal'
+}
+
 export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   const router = useRouter()
 
@@ -54,7 +61,17 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   async function fetchJobs() {
     if(schedule.id) {
       const { data } = await api.get(`/jobs/schedule/${schedule.id}`)
-      return data;
+      const jobs = data.map(job => ({
+        ...job,
+        date_job_description:  new Intl.DateTimeFormat('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric'
+        }).format(new Date(data[0].date_job))
+      }))
+      return jobs;
     }
     return []
   }
@@ -151,7 +168,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
       </div>
       <ul className="space-y-3">
         <li><strong className="mr-2">Nome:</strong>{schedule.title}</li>
-        <li><strong className="mr-2">Repetição:</strong>{schedule.type_schedule}</li>
+        <li><strong className="mr-2">Tipo:</strong>{schedule.type_scheduleDescription}</li>
         <li>
         <strong className="mr-2">Status:</strong>{schedule.active 
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
@@ -177,7 +194,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
       <div key={job.id} className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
         <div className="flex justify-between w-full items-center mb-8 ">
           <h1 className="text-2xl font-normal text-gray-600">
-            Trabalho execuado em {job.date_job}
+            Trabalho execuado em {job.date_job_description}
           </h1>
         </div>
         <table className="table-fixed text-sm">
@@ -220,7 +237,10 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
 
 export const getServerSideProps: GetServerSideProps = withSSRAuth(async ({params}) => {
   const { id } = params;
-  const {data: schedule} = await api.get(`/schedules/${id}`)
+  const { data } = await api.get(`/schedules/${id}`)
+  const schedule = Object.assign(data, {
+    type_scheduleDescription: acceptedTypeSchedule[data.type_schedule]
+  })
 
   const { data: jobs } = await api.get(`/jobs/schedule/${id}`)
 

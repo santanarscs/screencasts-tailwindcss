@@ -5,13 +5,20 @@ export type Schedule = {
   id: string;
   name: string;
   description: string;
-  repeat: string;
+  type_schedule: string;
+  type_scheduleDescription?: string;
   tags: string[];
 }
 
 type GetSchedulesResponse = {
   totalCount: number;
   schedules: Schedule[]
+}
+
+const acceptedTypeSchedule = {
+  'daily': 'Diário',
+  'weekly': 'Semanal',
+  'monthly': 'Mensal'
 }
 
 const TEN_MINUTES_IN_MILLISECONDS = 1000 * 60 * 10;
@@ -24,7 +31,10 @@ export async function getSchedules(page: number, owner_id: string): Promise<GetS
       owner_id
     }
   })
-  const schedules= data
+  const schedules = data.map(schedule => ({
+    ...schedule,
+    type_scheduleDescription: acceptedTypeSchedule[schedule.type_schedule]
+  }))
   const totalCount = headers['x-total-count']
 
   return { schedules, totalCount }
