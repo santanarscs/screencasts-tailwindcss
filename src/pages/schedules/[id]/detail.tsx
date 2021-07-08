@@ -143,9 +143,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
               Editar
             </a>
           </NextLink>
-          <button onClick={handleRunJob} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-purple-400 text-white">
-            {isLoading ? 'Aguarde...' : 'Executar agora'}
-          </button>
           {schedule.active 
           ? (
           <button onClick={handleDesactiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-gray-300 text-gray-700">
