@@ -3,11 +3,11 @@ import { api } from '../api'
 
 export type Schedule = {
   id: string;
-  name: string;
-  description: string;
+  title: string;
   type_schedule: string;
   type_scheduleDescription?: string;
-  tags: string[];
+  terms: string[];
+  active: boolean
 }
 
 type GetSchedulesResponse = {
@@ -41,8 +41,8 @@ export async function getSchedules(page: number, owner_id: string): Promise<GetS
 }
 
 export function useSchedules(page: number, owner_id: string, options?:UseQueryOptions ) {
-  return useQuery(['schedules', page], () => getSchedules(page, owner_id), {
+  return useQuery<GetSchedulesResponse, Error>(['schedules', page], () => getSchedules(page, owner_id), {
     staleTime: TEN_MINUTES_IN_MILLISECONDS,
     ...options
-  })
+  } as any)
 }
