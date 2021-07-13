@@ -7,7 +7,7 @@ export function SidebarNav() {
     <div className="items-start space-y-4 ">
       <NavSection title="GERAL">
         <NavLink icon={HomeIcon} href="/dashboard">Dashboard</NavLink>
-        <NavLink icon={UserIcon} href="/parlamentares">Parlamentares</NavLink>
+        <NavLink icon={UserIcon} href="/representatives">Parlamentares</NavLink>
         <NavLink icon={DocumentIcon} href="/propostas">Propostas</NavLink>
       </NavSection>
       <NavSection title="AUTOMAÇÃO">
