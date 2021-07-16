@@ -2,13 +2,13 @@ import NextLink from 'next/link'
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
 import { api } from '../../../services/api';
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { queryClient } from '../../../services/queryClient';
 import { useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
-import { Chart } from '../../../components/Chart';
+import { PencilAltIcon, CogIcon, CheckIcon, XIcon  } from '@heroicons/react/outline'
 
 type Tag = {
   id: string;
@@ -67,8 +67,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric'
         }).format(new Date(data[0].date_job))
       }))
       return jobs;
@@ -129,7 +127,12 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   function openModalConfirm() {
     setIsOpenModal(true)
   }
- 
+
+  async function handleDownloadDoc(jobId: string) {
+    const response = await api(`jobs/${jobId}/export_docx`);
+    window.open(`${process.env.NEXT_PUBLIC_API}/files/${response.data}`)
+  }
+
   return (
     <DefaultLayoutComponent>
     <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
@@ -139,27 +142,24 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         </h1>
         <div className="flex space-x-2">
           <NextLink href={`/schedules/${schedule.id}/edit`} passHref>
-            <a className="flex justify-center items-center  py-1 px-2 uppercase rounded-md text-sm bg-brand text-white">
-              Editar
+            <a className="btn btn-primary">
+              <PencilAltIcon className="h-4 w-4" />
             </a>
           </NextLink>
           {schedule.active 
           ? (
-          <button onClick={handleDesactiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-gray-300 text-gray-700">
-            Desativar
+          <button onClick={handleDesactiveSchedule} className="btn bg-gray-300 text-gray-700">
+            <XIcon  className="h-4 w-4" />
           </button>
           )
           : (
-          <button onClick={handleActiveSchedule} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-green-500 text-white">
-            Ativar
+          <button onClick={handleActiveSchedule} className="btn bg-green-500 text-white">
+            <CheckIcon className="h-4 w-4" />
           </button>
           )
           }
-          <button onClick={handleRunJob} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-purple-400 text-white">
-            {isLoading ? 'Executando...' : 'Executar'}
-          </button>
-          <button onClick={openModalConfirm} className="flex justify-center items-center uppercase  py-1 px-2 rounded-md text-sm bg-red-400 text-white">
-            Remover
+          <button onClick={handleRunJob} className="btn bg-purple-400 text-white">
+            {isLoading ? 'Executando...' : <CogIcon className="h-4 w-4"/>}
           </button>
         </div>
       </div>
@@ -178,14 +178,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         </li>
       </ul>
     </div>
-    <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
-      <div className="flex justify-between w-full items-center mb-8 ">
-        <h1 className="text-2xl font-normal text-gray-600">
-          Últimos trabalhos
-        </h1>
-      </div>
-      <Chart categories={categories} data={series} />
-    </div>
 
     {jobsData.map(job => (
       <div key={job.id} className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
@@ -193,8 +185,13 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
           <h1 className="text-2xl font-normal text-gray-600">
             Trabalho execuado em {job.date_job_description}
           </h1>
+          <div>
+            <button className="btn bg-blue-400 text-white mr-2" onClick={() => handleDownloadDoc(job.id)}>Detalhes</button>
+            <button className="btn bg-green-500 text-white" onClick={() => handleDownloadDoc(job.id)}>Baixar .docx</button>
+          </div>
         </div>
-        <table className="table-fixed text-sm">
+        <span>Foram encontradas: {job.items.length} propostas</span>
+        {/* <table className="table-fixed text-sm">
           <thead>
             <tr>
               <th className="text-left py-1 px-2 w-1/12">Número</th>
@@ -217,7 +214,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table> */}
       </div>
     ))}
     

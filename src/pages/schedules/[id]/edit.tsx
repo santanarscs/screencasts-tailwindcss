@@ -1,4 +1,4 @@
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from "../../../services/api";
@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { withSSRAuth } from "../../../utils/withSSRAuth";
 import { DefaultLayoutComponent } from "../../../components/DefaultLayout";
-
+import ReactSelect, { Theme } from 'react-select'
 type Tag = {
   id: string;
   name: string;
@@ -32,6 +32,7 @@ type CreateScheduleFormData = {
   type_schedule: string;
   tags: string[],
   target: string;
+  type_proposition: any[],
   active: boolean,
 }
 type ScheduleEditProps = {
@@ -45,6 +46,40 @@ const createScheduleFormSchema = yup.object().shape({
   target: yup.string().required('Alvo obrigatório'),
 })
 
+const optionsPropositions = [
+  {label: 'PL', value: 'PL'},
+  {label: 'PDL', value: 'PDL'},
+]
+
+const themeProps = (theme: Theme): Theme => {
+  return {
+    ...theme,
+    colors: {
+      ...theme.colors,
+      primary: '#55BAEB',
+      primary25: '#96d6f7',
+      primary50: '#999591',
+      primary75: '#4c9aff',
+      danger: '#de350b',
+      dangerLight: '#ffbdad',
+      neutral0: '#E5E7EB',
+      neutral5: '#50557F',
+      neutral10: '#55BAEB',
+      neutral20: 'transparent',
+      neutral30: '#55BAEB',
+      // neutral40: '#999999',
+      // neutral50: '#808080',
+      // neutral60: '#666666',
+      // neutral70: '#4d4d4d',
+      // neutral80: '#F4EDE8',
+      // neutral90: '#1a1a1a',
+    },
+    spacing: {
+      ...theme.spacing,
+      controlHeight:48
+    }
+  };
+};
 
 export default function EditSchedule({ schedule }: ScheduleEditProps) {
   
@@ -78,17 +113,18 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
     }
   })
 
-  const { register, handleSubmit, formState, reset } = useForm({
+  const { register, control, handleSubmit, formState, reset } = useForm({
     resolver: yupResolver(createScheduleFormSchema)
   })
 
   useEffect(() => {
-    reset({...schedule})
+    reset({...schedule, type_proposition: [{value: 'PL', label: 'PL'}]})
   },[reset])
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
-    await createSchedule.mutateAsync({...values, tags})
-    router.push('/schedules')
+    console.log(values)
+    // await createSchedule.mutateAsync({...values, tags})
+    // router.push('/schedules')
   }
   const { errors } = formState
 
@@ -120,6 +156,16 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="title" label="Nome" error={errors.title} {...register('title')} />
+          <div>
+            <label htmlFor="type_proposition" className="text-gray-600 tracking-wide">Siglas</label>
+            <Controller 
+              render={
+                ({ field }) => <ReactSelect {...field} theme={themeProps} options={optionsPropositions} isMulti={true} placeholder="Selecione as siglas"/>
+              }
+              control={control}
+              name="type_proposition"
+            />
+          </div>
           <Select name="type_schedule" label="Repetição" error={errors.type_schedule} {...register('type_schedule')} options={options} />
           <Select name="target" label="Alvo" error={errors.target} {...register('target')} options={targetOptions} />
           <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />

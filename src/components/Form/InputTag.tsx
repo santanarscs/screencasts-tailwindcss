@@ -28,7 +28,7 @@ export function InputTags({label, name, tags, handleAddTag, handleRemoveTag}: In
   return (
     <>
       {!!label && <label htmlFor={name} className="text-gray-600 tracking-wide">{label}</label>}
-      <div className="flex flex-wrap w-full items-center rounded-md my-1 px-2 py-1 bg-gray-200">
+      <div className="flex flex-wrap w-full items-center rounded-md my-1 px-2 py-1 bg-gray-200 ">
         <ul className="flex flex-wrap">
           {tags.map((tag, index) => (
             <li key={tag} className="flex items-center px-2 rounded-md mr-1 bg-blue-300 text-white">
