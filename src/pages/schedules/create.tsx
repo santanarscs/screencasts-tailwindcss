@@ -1,7 +1,6 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import Link from "next/link";
 import { api } from "../../services/api";
 import { queryClient } from "../../services/queryClient";
 import { useRouter } from "next/router";
@@ -13,7 +12,7 @@ import { useState } from "react";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
 import { useSession } from 'next-auth/client';
-import ReactSelect, { Theme } from 'react-select'
+import { MultiSelect } from '../../components/Form/MultiSelect';
 
 type CreateScheduleFormData = {
   title: string;
@@ -28,39 +27,10 @@ type CreateScheduleFormData = {
 const createScheduleFormSchema = yup.object().shape({
   title: yup.string().required('Nome obrigatório'),
   type_schedule: yup.string().required('Tipo é obrigatório'),
-  // teste: yup.string().required('Tipo é obrigatório'),
   target: yup.string().required('Alvo é obrigatório')
 })
 
-const themeProps = (theme: Theme): Theme => {
-  return {
-    ...theme,
-    colors: {
-      ...theme.colors,
-      primary: '#55BAEB',
-      primary25: '#96d6f7',
-      primary50: '#999591',
-      primary75: '#4c9aff',
-      danger: '#de350b',
-      dangerLight: '#ffbdad',
-      neutral0: '#E5E7EB',
-      neutral5: '#50557F',
-      neutral10: '#55BAEB',
-      neutral20: 'transparent',
-      neutral30: '#55BAEB',
-      // neutral40: '#999999',
-      // neutral50: '#808080',
-      // neutral60: '#666666',
-      // neutral70: '#4d4d4d',
-      // neutral80: '#F4EDE8',
-      // neutral90: '#1a1a1a',
-    },
-    spacing: {
-      ...theme.spacing,
-      controlHeight:48
-    }
-  };
-};
+
 
 export default function CreateSchedule() {
   
@@ -130,18 +100,9 @@ export default function CreateSchedule() {
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="title" label="Nome" error={errors.title} {...register('title')} />
-          <div>
-            <label htmlFor="type_proposition" className="text-gray-600 tracking-wide">Siglas</label>
-            <Controller 
-              render={
-                ({ field }) => <ReactSelect {...field} theme={themeProps} options={optionsPropositions} isMulti={true} placeholder="Selecione as siglas"/>
-              }
-              control={control}
-              name="type_proposition"
-            />
-          </div>
-          <Select name="type_schedule" label="Tipo" error={errors.type_schedule} {...register('type_schedule')} options={options} />
-          <Select name="target" label="Alvo" error={errors.target} {...register('target')} options={targetOptions} />
+          <MultiSelect name="type_proposition" label="Siglas" control={control} options={optionsPropositions} />
+          <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" error={errors.type_schedule} control={control} options={options} />
+          <Select name="target" label="Alvo" placeholder="Selecione o alvo" error={errors.target}control={control} options={targetOptions} />
           <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
