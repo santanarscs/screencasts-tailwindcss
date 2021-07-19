@@ -1,13 +1,8 @@
-import { PlusIcon, PencilIcon, XIcon, EyeIcon } from '@heroicons/react/outline'
+import { PlusCircleIcon, ClockIcon } from '@heroicons/react/outline'
 import NextLink from 'next/link'
-import { Pagination } from "../../components/Pagination";
 import { useSchedules } from "../../services/hooks/useSchedule";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { ConfirmModal } from "../../components/ConfirmModal";
-import { useMutation } from "react-query";
-import { api } from "../../services/api";
-import { queryClient } from "../../services/queryClient";
 import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { withSSRAuth } from "../../utils/withSSRAuth";
 import { getSession } from 'next-auth/client';
@@ -30,108 +25,38 @@ type ScheduleListProps = {
 export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
   const router = useRouter()
   const [page, setPage] = useState(1)
-  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const {data, isLoading, error, isFetching, refetch} = useSchedules(page, owner_id)
-  console.log(data)
 
-  const removeSchedule = useMutation(async (schedule: Schedule) => {
-    await api.delete(`schedules/${schedule.id}`)
-  }, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('schedules')
-    }
-  })
 
-  function handleEditSchedule(id: string) {
-    router.push(`/schedules/${id}/edit`)
-  }
   function handleDetailSchedule(id: string) {
     router.push(`/schedules/${id}/detail`)
   }
 
-  function openModalConfirm(data: Schedule) {
-    setSelectedSchedule(data)
-    setIsOpenModal(true)
-  }
-  async function handleRemoveSchedule() {
-    await removeSchedule.mutateAsync(selectedSchedule)
-    setIsOpenModal(false)
-  }
-
   return (
     <DefaultLayoutComponent>
-      <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
-        <div className="flex justify-between w-full items-center mb-8 ">
-          <h1 className="text-2xl font-normal text-gray-600">
-            Meus Agendamentos
-          </h1>
-          <NextLink href="/schedules/create" passHref>
-            <a className=" flex justify-center items-center  py-2 px-3 rounded-md text-sm bg-brand text-white">
-              <PlusIcon className="h-5 w-5 mr-2" />
-              <span className="uppercase">Criar novo</span>
-            </a>
-          </NextLink>
-        </div>
-        {isLoading ? (
-            <div className="w-full flex flex-col justify-center items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-14 w-14 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-        ) : (
-        <>
-          <table className="min-w-max w-full table-auto">
-            <thead>
-              <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">Nome</th>
-                <th className="py-3 px-6 text-left">Tipo</th>
-                <th className="py-3 px-6 text-center">Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 text-sm font-light">
-              {data.schedules.map(schedule => (
-                <tr key={schedule.id} className="border-b border-gray-200 hover:bg-gray-200">
-                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.title}</td>
-                  <td className="py-3 px-6 text-left whitespace-nowrap" >{schedule.type_scheduleDescription}</td>
-                  <td className="py-3 px-6 text-center" >
-                    {schedule.active 
-                    ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
-                    : (<span className="bg-gray-300 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
-                  </td>
-                  <td className="py-3 px-6 text-center flex space-x-1" >
-                    <button onClick={() => handleDetailSchedule(schedule.id)} className="flex justify-center items-center  bg-brand text-xs text-white rounded-md p-1">
-                      <EyeIcon className="h-3 w-3"/>
-                    </button>
-                    <button onClick={() => handleEditSchedule(schedule.id)} className="flex justify-center items-center  bg-blue-500 text-xs text-white rounded-md p-1">
-                      <PencilIcon className="h-3 w-3"/>
-                    </button>
-                    <button onClick={() => openModalConfirm(schedule)} className=" flex justify-center items-center bg-red-400 text-xs text-white rounded-md p-1">
-                      <XIcon className="h-3 w-3"/>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              
-            </tbody>
-          </table>
-          <Pagination 
-            totalCountOfRegisters={data.totalCount}
-            currentPage={page}
-            onPageChange={setPage}
-          />
-        </>
-        )}
+      <div className="grid grid-cols-4 gap-x-8">
+        <NextLink href="/schedules/create" passHref>
+          <div className="bg-transparent border-4 border-dashed border-blue-400 text-blue-400 rounded-md pt-4 pb-10 px-2 flex flex-col justify-center items-center cursor-pointer hover:-translate-y-1.5 hover:border-opacity-75 hover:text-opacity-75 transform transition">
+            <PlusCircleIcon className="h-40 w-40" />
+            <h1 className="text-2xl text-gray-700 tracking-wide">Novo agendamento</h1>
+            <small className="text-gray-400 text-center text-md mt-2">Crie um agendamento para receber e-mails com informações.</small>
+          </div>
+        </NextLink>
+        {data?.schedules.map(schedule => (
+          <div key={schedule.id} onClick={() => handleDetailSchedule(schedule.id)} className="bg-white rounded-md pt-4 pb-10 px-2 flex flex-col justify-center items-center cursor-pointer hover:-translate-y-1.5 transform transition">
+            {schedule.active
+              ? (<ClockIcon className=" text-blue-400 h-40 w-40" />)
+              : (<ClockIcon className=" text-gray-400 h-40 w-40" />)
+            }
+            
+            <h1 className="text-2xl text-gray-700 tracking-wide text-center">{schedule.type_scheduleDescription}</h1>
+            <small className="text-gray-400 text-center text-md mt-2">{schedule.title}</small>
+            {schedule.active 
+              ? (<span className="bg-green-400 mt-2 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
+              : (<span className="bg-gray-300 mt-2 px-2 py-1 rounded-md text-xs text-gray-700 ">Desativado</span>)}
+          </div>
+        ))}
       </div>
-      <ConfirmModal
-        title="Tem certeza desta ação?"
-        isOpen={isOpenModal}
-        handleCloseModal={() => setIsOpenModal(false)}
-        handleConfirmModal={handleRemoveSchedule}
-        text="Deseja remover este item do banco de dados?"
-      />
     </DefaultLayoutComponent>
   )
 }
