@@ -15,9 +15,16 @@ import { useSession } from 'next-auth/client';
 import { MultiSelect } from '../../components/Form/MultiSelect';
 
 type CreateScheduleFormData = {
-  title: string;
-  target:  string;
-  type_proposition: string[];
+  name: string;
+  type_proposition: {label:string ,value: string}[];
+  owner_id: string;
+  type_schedule: {label:string ,value: string};
+  tags: string[],
+  active: boolean,
+}
+type CreateSchedule = {
+  name: string;
+  type_proposition: {label:string ,value: string}[];
   owner_id: string;
   type_schedule: string;
   tags: string[],
@@ -25,9 +32,9 @@ type CreateScheduleFormData = {
 }
 
 const createScheduleFormSchema = yup.object().shape({
-  title: yup.string().required('Nome obrigatório'),
-  type_schedule: yup.string().required('Tipo é obrigatório'),
-  target: yup.string().required('Alvo é obrigatório')
+  name: yup.string().required('Nome obrigatório'),
+  type_schedule: yup.array().required('Escolha um tipo de agendamento'),
+  type_proposition: yup.array()
 })
 
 
@@ -46,16 +53,21 @@ export default function CreateSchedule() {
     {label: 'Mensal', value: 'monthly'}
   ]
   const optionsPropositions = [
-    {label: 'PL', value: 'PL'},
-    {label: 'PDL', value: 'PDL'},
-  ]
-  const targetOptions = [
-    {label: 'Câmara dos Deputados', value: 'camara_deputados'},
-    {label: 'Senado Federal', value: 'senado'},
-    {label: 'Diário Oficial da União', value: 'diario_oficial'},
+    {label: 'PEC - Proposta de Emenda à Constituição', value: 'PEC'},
+    {label: 'PLP - Projeto de Lei Complementar', value: 'PLP'},
+    {label: 'PL - Projeto de Lei', value: 'PL'},
+    {label: 'MPV - Medida Provisória', value: 'MPV'},
+    {label: 'PLV - Projeto de Lei de Conversão', value: 'PLV'},
+    {label: 'PDC - Projeto de Decreto Legislativo', value: 'PDC'},
+    {label: 'PRC - Projeto de Resolução', value: 'PRC'},
+    {label: 'REQ - Requerimento', value: 'REQ'},
+    {label: 'RIC - Requerimento de Informação', value: 'RIC'},
+    {label: 'RCP - Requerimento de Instituição de CPI', value: 'RCP'},
+    {label: 'MSC - Mensagem', value: 'MSC'},
+    {label: 'INC - Indicação', value: 'INC'},
   ]
 
-  const createSchedule = useMutation(async (schedule: CreateScheduleFormData) => {
+  const createSchedule = useMutation(async (schedule: CreateSchedule) => {
     const response = await api.post('schedules', schedule)
     return response.data;
   }, {
@@ -65,18 +77,19 @@ export default function CreateSchedule() {
   })
 
   const { register, control, handleSubmit, formState } = useForm({
-    resolver: yupResolver(createScheduleFormSchema)
+    // resolver: yupResolver(createScheduleFormSchema)
   })
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
-    // await createSchedule.mutateAsync({
-    //   ...values, 
-    //   active: true, 
-    //   owner_id: session?.sub as string,
-    //   tags
-    // })
-    // router.push('/schedules')
-    console.log(values)
+    
+    await createSchedule.mutateAsync({
+      ...values, 
+      owner_id: session?.sub as string,
+      active: true,
+      type_schedule: values.type_schedule.value,
+      tags
+    })
+    router.push('/schedules')
   }
   const { errors } = formState
 
@@ -99,11 +112,10 @@ export default function CreateSchedule() {
           </h1>
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
-          <Input name="title" label="Nome" error={errors.title} {...register('title')} />
+          <Input name="name" label="Nome" error={errors.name} {...register('name')} />
           <MultiSelect name="type_proposition" label="Siglas" control={control} options={optionsPropositions} />
           <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" error={errors.type_schedule} control={control} options={options} />
-          <Select name="target" label="Alvo" placeholder="Selecione o alvo" error={errors.target}control={control} options={targetOptions} />
-          <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
+          <InputTags name="tags" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
       </div>

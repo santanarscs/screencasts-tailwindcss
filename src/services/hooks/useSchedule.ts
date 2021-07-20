@@ -3,7 +3,7 @@ import { api } from '../api'
 
 export type Schedule = {
   id: string;
-  title: string;
+  name: string;
   type_schedule: string;
   type_scheduleDescription?: string;
   terms: string[];

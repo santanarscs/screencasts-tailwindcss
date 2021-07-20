@@ -13,26 +13,40 @@ import { GetServerSideProps } from "next";
 import { withSSRAuth } from "../../../utils/withSSRAuth";
 import { DefaultLayoutComponent } from "../../../components/DefaultLayout";
 import { MultiSelect } from '../../../components/Form/MultiSelect';
-type Tag = {
-  id: string;
-  name: string;
-}
 
 type Schedule = {
   id: string;
-  title: string;
-  type_schedule: string;
-  target: string;
-  tags: Tag[];
-  active: boolean
-}
-
-type CreateScheduleFormData = {
-  title: string;
+  name: string;
+  type_proposition: {label:string ,value: string}[];
+  owner_id: string;
   type_schedule: string;
   tags: string[],
-  target: string;
-  type_proposition: any[],
+  active: boolean,
+}
+
+type CreateSchedule = {
+  name: string;
+  type_proposition: {label:string ,value: string}[];
+  owner_id: string;
+  type_schedule: string;
+  tags: string[],
+  active: boolean,
+}
+
+const acceptedTypeSchedule = {
+  'daily': 'Diário',
+  'weekly': 'Semanal',
+  'monthly': 'Mensal'
+}
+
+
+
+type CreateScheduleFormData = {
+  name: string;
+  type_proposition: {label:string ,value: string}[];
+  owner_id: string;
+  type_schedule: {label:string ,value: string};
+  tags: string[],
   active: boolean,
 }
 type ScheduleEditProps = {
@@ -41,15 +55,10 @@ type ScheduleEditProps = {
 
 
 const createScheduleFormSchema = yup.object().shape({
-  title: yup.string().required('Nome obrigatório'),
+  name: yup.string().required('Nome obrigatório'),
   type_schedule: yup.string().required('Repetição obrigatório'),
   target: yup.string().required('Alvo obrigatório'),
 })
-
-const optionsPropositions = [
-  {label: 'PL', value: 'PL'},
-  {label: 'PDL', value: 'PDL'},
-]
 
 export default function EditSchedule({ schedule }: ScheduleEditProps) {
   
@@ -57,7 +66,7 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
 
   const [tags, setTags] = useState<string[]>(() => {
     if(schedule.tags){
-      return schedule.tags.map(tag => tag.name)
+      return schedule.tags
     }
     return [] 
   })
@@ -68,13 +77,22 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
     {label: 'Mensal', value: 'monthly'}
   ]
 
-  const targetOptions = [
-    {label: 'Câmara dos Deputados', value: 'camara_deputados'},
-    {label: 'Senado Federal', value: 'senado'},
-    {label: 'Diário Oficial da União', value: 'diario_oficial'},
+  const optionsPropositions = [
+    {label: 'PEC - Proposta de Emenda à Constituição', value: 'PEC'},
+    {label: 'PLP - Projeto de Lei Complementar', value: 'PLP'},
+    {label: 'PL - Projeto de Lei', value: 'PL'},
+    {label: 'MPV - Medida Provisória', value: 'MPV'},
+    {label: 'PLV - Projeto de Lei de Conversão', value: 'PLV'},
+    {label: 'PDC - Projeto de Decreto Legislativo', value: 'PDC'},
+    {label: 'PRC - Projeto de Resolução', value: 'PRC'},
+    {label: 'REQ - Requerimento', value: 'REQ'},
+    {label: 'RIC - Requerimento de Informação', value: 'RIC'},
+    {label: 'RCP - Requerimento de Instituição de CPI', value: 'RCP'},
+    {label: 'MSC - Mensagem', value: 'MSC'},
+    {label: 'INC - Indicação', value: 'INC'},
   ]
 
-  const createSchedule = useMutation(async (data: CreateScheduleFormData) => {
+  const createSchedule = useMutation(async (data: CreateSchedule) => {
     const response = await api.put(`/schedules/${schedule.id}`, data)
     return response.data;
   }, {
@@ -84,17 +102,20 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
   })
 
   const { register, control, handleSubmit, formState, reset } = useForm({
-    resolver: yupResolver(createScheduleFormSchema)
+    // resolver: yupResolver(createScheduleFormSchema)
   })
 
   useEffect(() => {
-    reset({...schedule, type_proposition: [{value: 'PL', label: 'PL'}]})
+    reset(schedule)
   },[reset])
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
-    console.log(values)
-    // await createSchedule.mutateAsync({...values, tags})
-    // router.push('/schedules')
+    await createSchedule.mutateAsync({
+      ...values, 
+      type_schedule: values.type_schedule.value,
+      tags
+    })
+    router.push('/schedules')
   }
   const { errors } = formState
 
@@ -102,17 +123,9 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
     setTags([...tags, tag])
 
   }
-  async function handleRemoveTag(index: number) {
-    const tag_id = schedule.tags.find(tag => tag.name === tags[index]).id
-
-    if(tag_id) {
-      await api.delete(`/tags/${tag_id}`)
-    }
-    
+  function handleRemoveTag(index: number) {
     const newTags = [...tags]
-    
     newTags.splice(index, 1)
-
     setTags(newTags)
   }
 
@@ -125,11 +138,10 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
           </h1>
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
-          <Input name="title" label="Nome" error={errors.title} {...register('title')} />
-          <MultiSelect name="type_proposition" label="Siglas" control={control} options={optionsPropositions} />
+        <Input name="name" label="Nome" error={errors.name} {...register('name')} />
+          <MultiSelect name="type_proposition" defaultValue={control.defaultValuesRef.current.type_proposition} label="Siglas" control={control} options={optionsPropositions} />
           <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" error={errors.type_schedule} control={control} options={options} />
-          <Select name="target" label="Alvo" placeholder="Selecione o alvo" error={errors.target}control={control} options={targetOptions} />
-          <InputTags name="terms" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
+          <InputTags name="tags" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
       </div>
@@ -140,7 +152,10 @@ export default function EditSchedule({ schedule }: ScheduleEditProps) {
 export const getServerSideProps: GetServerSideProps = withSSRAuth(async ({params}) => {
   const { id } = params;
   const response = await api.get(`/schedules/${id}`)
-  const schedule = response.data
+
+  const schedule = Object.assign(response.data, {
+    type_schedule: {label: acceptedTypeSchedule[response.data.type_schedule], value: response.data.type_schedule}
+  })
   return {
     props: { schedule }
   }

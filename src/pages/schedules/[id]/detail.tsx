@@ -1,26 +1,24 @@
-import NextLink from 'next/link'
+import { Menu, Transition } from '@headlessui/react'
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
 import { api } from '../../../services/api';
 import { useMutation, useQuery } from 'react-query';
 import { queryClient } from '../../../services/queryClient';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
-import { PencilAltIcon, CogIcon, CheckIcon, XIcon  } from '@heroicons/react/outline'
+import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon } from '@heroicons/react/outline'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 
-type Tag = {
-  id: string;
-  name: string;
-}
 
 type Schedule = {
   id: string;
-  title: string;
+  name: string;
+  type_proposition: {label:string ,value: string}[];
   type_schedule: string;
   type_scheduleDescription?: string;
-  tags: Tag[];
+  tags: string[];
   active: boolean
 }
 
@@ -76,15 +74,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   const {data: jobsData, isLoading, error, refetch } = useQuery('jobs', fetchJobs, {
     initialData: jobs
   })
-
-
-  const [series, setSeries] = useState(() => {
-    return jobs.map(job => job.items.length)
-  })
-  const [categories, setCategories] = useState(() => {
-    return jobs.map(job => job.date_job)
-  })
-
+ 
   const updateSchedule = useMutation(async (data: Schedule) => {
     await api.put(`/schedules/${schedule.id}`, data)
   }, {
@@ -115,18 +105,17 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
     setIsOpenModal(false)
     router.push('/schedules')
   }
+  function handleEditSchedule() {
+    router.push(`/schedules/${schedule.id}/edit`)
+  }
 
   async function handleRunJob() {
-    await api.post('/jobs/once',  {
+    await api.post('/jobs/run',  {
       schedule_id: schedule.id
     })
     await refetch()
-    console.log(jobsData)
   }
 
-  function openModalConfirm() {
-    setIsOpenModal(true)
-  }
 
   async function handleDownloadDoc(jobId: string) {
     const response = await api(`jobs/${jobId}/export_docx`);
@@ -140,32 +129,159 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         <h1 className="text-2xl font-normal text-gray-600">
           Detalhes
         </h1>
-        <div className="flex space-x-2">
-          <NextLink href={`/schedules/${schedule.id}/edit`} passHref>
-            <a className="btn btn-primary">
-              <PencilAltIcon className="h-4 w-4" />
-            </a>
-          </NextLink>
-          {schedule.active 
-          ? (
-          <button onClick={handleDesactiveSchedule} className="btn bg-gray-300 text-gray-700">
-            <XIcon  className="h-4 w-4" />
-          </button>
-          )
-          : (
-          <button onClick={handleActiveSchedule} className="btn bg-green-500 text-white">
-            <CheckIcon className="h-4 w-4" />
-          </button>
-          )
-          }
-          <button onClick={handleRunJob} className="btn bg-purple-400 text-white">
-            {isLoading ? 'Executando...' : <CogIcon className="h-4 w-4"/>}
-          </button>
-        </div>
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-brand rounded-md  hover:bg-opacity-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+              Opções
+              <ChevronDownIcon
+                className="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
+                aria-hidden="true"
+              />
+            </Menu.Button>
+          </div>
+          <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="px-1 py-1 ">
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={handleEditSchedule}
+                    className={`${
+                      active ? 'bg-violet-500 text-brand' : 'text-gray-700'
+                    } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                  >
+                    {active ? (
+                      <PencilAltIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <PencilAltIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    )}
+                    Editar
+                  </button>
+                )}
+              </Menu.Item>
+              {schedule.active 
+                ? (
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={handleDesactiveSchedule}
+                        className={`${
+                          active ? 'bg-violet-500 text-brand' : 'text-gray-700'
+                        } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                      >
+                        {active ? (
+                          <XIcon
+                            className="w-5 h-5 mr-2"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <XIcon
+                            className="w-5 h-5 mr-2"
+                            aria-hidden="true"
+                          />
+                        )}
+                        Desativar
+                      </button>
+                    )}
+                  </Menu.Item>
+                )
+                : (
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={handleActiveSchedule}
+                        className={`${
+                          active ? 'bg-violet-500 text-brand' : 'text-gray-700'
+                        } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                      >
+                        {active ? (
+                          <CheckIcon
+                            className="w-5 h-5 mr-2"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <CheckIcon
+                            className="w-5 h-5 mr-2"
+                            aria-hidden="true"
+                          />
+                        )}
+                        Ativar
+                      </button>
+                    )}
+                  </Menu.Item>
+                )
+              }
+            </div>
+            <div className="px-1 py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={handleRunJob}
+                    className={`${
+                      active ? 'bg-violet-500 text-brand' : 'text-gray-700'
+                    } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                  >
+                    {active ? (
+                      <CogIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <CogIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    )}
+                    Rodar Trabalho
+                  </button>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={() => setIsOpenModal(true)}
+                    className={`${
+                      active ? 'bg-violet-500 text-brand' : 'text-gray-700'
+                    } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                  >
+                    {active ? (
+                      <TrashIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <TrashIcon
+                        className="w-5 h-5 mr-2"
+                        aria-hidden="true"
+                      />
+                    )}
+                    Deletar
+                  </button>
+                )}
+              </Menu.Item>
+            </div>
+          </Menu.Items>
+        </Transition>
+        </Menu>
       </div>
       <ul className="space-y-3">
-        <li><strong className="mr-2">Nome:</strong>{schedule.title}</li>
+        <li><strong className="mr-2">Nome:</strong>{schedule.name}</li>
         <li><strong className="mr-2">Tipo:</strong>{schedule.type_scheduleDescription}</li>
+        <li><strong className="mr-2">Tipos de propostas:</strong>{schedule.type_proposition.map(type => type.label).join(' - ')}</li>
         <li>
         <strong className="mr-2">Status:</strong>{schedule.active 
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
@@ -173,7 +289,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         </li>
         <li><strong className="mr-2">Termos:</strong>
           <div className="space-x-2 mt-2">
-            {schedule.tags.map(tag => ( <span className="py-1 px-2 bg-gray-300 rounded-md text-sm"  key={tag.id}>{tag.name}</span>))}
+            {schedule.tags.map(tag => ( <span className="py-1 px-2 bg-gray-300 rounded-md text-sm"  key={tag}>{tag}</span>))}
           </div>
         </li>
       </ul>
@@ -191,30 +307,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
           </div>
         </div>
         <span>Foram encontradas: {job.items.length} propostas</span>
-        {/* <table className="table-fixed text-sm">
-          <thead>
-            <tr>
-              <th className="text-left py-1 px-2 w-1/12">Número</th>
-              <th className="text-left py-1 px-2 w-1/12">Tipo</th>
-              <th className="text-left py-1 px-2 w-1/4">Apresentação</th>
-              <th className="text-left py-1 px-2 w-1/2">Ementa</th>
-              <th className="text-left py-1 px-2 w-1/5">Autor</th>
-              <th className="text-left py-1 px-2 w-1/4">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {job.items.map(item => (
-              <tr key={item.id}>
-                <td className="text-left py-1 px-2">{item.proposition_id}</td>
-                <td className="text-left py-1 px-2">{item.type_proposition}</td>
-                <td className="text-left py-1 px-2">{item.date_apresentation}</td>
-                <td className="text-left py-1 px-2">{item.text}</td>
-                <td className="text-left py-1 px-2">{item.author}</td>
-                <td className="text-left py-1 px-2">{item.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> */}
       </div>
     ))}
     
