@@ -31,7 +31,7 @@ const themeProps = (theme: Theme): Theme => {
   };
 };
 
-export function MultiSelect({name, label, options, control}) {
+export function MultiSelect({name, label, options, control, ...rest}) {
   return (
     <div>
       <label htmlFor={name} className="text-gray-600 tracking-wide">{label}</label>
@@ -41,6 +41,7 @@ export function MultiSelect({name, label, options, control}) {
         }
         control={control}
         name={name}
+        {...rest}
       />
     </div>
   )
