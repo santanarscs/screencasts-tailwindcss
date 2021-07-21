@@ -1,8 +1,11 @@
 module.exports = {
   purge: ['./src/pages/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
-  theme: {    
+  theme: { 
     extend: {
+      inset: {
+        '25': '6.5rem'
+      },
       colors: {
         brand: {
           DEFAULT: '#0fa9e6',

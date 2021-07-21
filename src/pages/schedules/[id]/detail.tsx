@@ -8,7 +8,7 @@ import { Fragment, useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
-import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon } from '@heroicons/react/outline'
+import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon, ClockIcon } from '@heroicons/react/outline'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
 
@@ -107,6 +107,9 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   }
   function handleEditSchedule() {
     router.push(`/schedules/${schedule.id}/edit`)
+  }
+  function handleDetailJob(job_id: string) {
+    router.push(`/jobs/${job_id}`)
   }
 
   async function handleRunJob() {
@@ -281,7 +284,14 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
       <ul className="space-y-3">
         <li><strong className="mr-2">Nome:</strong>{schedule.name}</li>
         <li><strong className="mr-2">Tipo:</strong>{schedule.type_scheduleDescription}</li>
-        <li><strong className="mr-2">Tipos de propostas:</strong>{schedule.type_proposition.map(type => type.label).join(' - ')}</li>
+        <li>
+            <strong className="mr-2">Tipos de propostas:</strong>
+            {schedule.type_proposition?.length 
+              ? (<>{schedule.type_proposition.map(type => type.label).join(' - ')}</>)
+              : (<span>Buscar por todos os tipos de Sigla</span>)
+            }
+            
+        </li>
         <li>
         <strong className="mr-2">Status:</strong>{schedule.active 
                   ? (<span className="bg-green-400 px-2 py-1 rounded-md text-xs text-white ">Ativado</span>) 
@@ -294,22 +304,31 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         </li>
       </ul>
     </div>
-
-    {jobsData.map(job => (
-      <div key={job.id} className="flex flex-1 flex-col rounded-md bg-gray-100 p-4 mt-4">
-        <div className="flex justify-between w-full items-center mb-8 ">
-          <h1 className="text-2xl font-normal text-gray-600">
-            Trabalho execuado em {job.date_job_description}
-          </h1>
-          <div>
-            <button className="btn bg-blue-400 text-white mr-2" onClick={() => handleDownloadDoc(job.id)}>Detalhes</button>
-            <button className="btn bg-green-500 text-white" onClick={() => handleDownloadDoc(job.id)}>Baixar .docx</button>
+    
+    <div className="relative container mx-auto px-6 flex flex-col space-y-8">
+      <div className="absolute z-0 w-2 h-full bg-white shadow-md inset-0 left-17 md:mx-auto md:right-0 md:left-0" ></div>
+      {jobsData.map((job, index) => (
+        <div key={job.id} className="relative z-10">
+          <img
+              src="/images/timer2.png"
+              alt=""
+              className="timeline-img"
+          />
+          <div className={(index % 2) === 0  ? `timeline-container` : 'timeline-container timeline-container-left'}>
+            <div className={(index % 2) === 0 ? `timeline-pointer` : 'timeline-pointer timeline-pointer-left'} aria-hidden="true"></div>
+            <div onClick={() => handleDetailJob(job.id)} className="bg-white p-6 rounded-md shadow-md cursor-pointer hover:shadow-xl transform transition">
+              <span className="font-bold text-brand text-sm tracking-wide">{job.date_job_description}</span>
+              {/* <h1 className="text-2xl font-bold pt-1">
+                  An amazing travel
+              </h1> */}
+              <p className="pt-1">
+                  Foram encontrados {job.items.length} propostas neste trabalho
+              </p>
+            </div>
           </div>
         </div>
-        <span>Foram encontradas: {job.items.length} propostas</span>
-      </div>
-    ))}
-    
+      ))}
+    </div>
     <ConfirmModal
       title="Tem certeza desta ação?"
       isOpen={isOpenModal}
