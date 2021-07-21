@@ -65,7 +65,8 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
-        }).format(new Date(data[0].date_job))
+          hour: 'numeric', minute: 'numeric', second: 'numeric'
+        }).format(new Date(job.date_job))
       }))
       return jobs;
     }
@@ -304,7 +305,6 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
         </li>
       </ul>
     </div>
-    
     <div className="relative container mx-auto px-6 flex flex-col space-y-8">
       <div className="absolute z-0 w-2 h-full bg-white shadow-md inset-0 left-17 md:mx-auto md:right-0 md:left-0" ></div>
       {jobsData.map((job, index) => (
