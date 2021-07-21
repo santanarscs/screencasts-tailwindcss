@@ -7,7 +7,7 @@ export function Header() {
   return (
     <header className="flex w-full max-w-screen-2xl h-20 mx-auto mt-4 px-6 items-center">
       <Logo />
-      <SearchBox />
+      {/* <SearchBox /> */}
       <div className="flex items-center ml-auto" >
         <NotificationsNav />
         <Profile showProfileData={true} />
