@@ -33,7 +33,7 @@ type CreateSchedule = {
 
 const createScheduleFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
-  type_schedule: yup.array().required('Escolha um tipo de agendamento'),
+  type_schedule: yup.object().required('Escolha um tipo de agendamento'),
   type_proposition: yup.array()
 })
 
@@ -77,7 +77,7 @@ export default function CreateSchedule() {
   })
 
   const { register, control, handleSubmit, formState } = useForm({
-    // resolver: yupResolver(createScheduleFormSchema)
+    resolver: yupResolver(createScheduleFormSchema)
   })
 
   const handleCreateSchedule: SubmitHandler<CreateScheduleFormData> = async (values) => {
@@ -113,8 +113,8 @@ export default function CreateSchedule() {
         </div>
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="name" label="Nome" error={errors.name} {...register('name')} />
-          <MultiSelect name="type_proposition" label="Siglas" control={control} options={optionsPropositions} />
-          <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" error={errors.type_schedule} control={control} options={options} />
+          <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" {...register('type_schedule')} error={errors.type_schedule} control={control} options={options} />
+          <MultiSelect name="type_proposition" label="Siglas" control={control} {...register('type_proposition')} options={optionsPropositions} />
           <InputTags name="tags" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>
