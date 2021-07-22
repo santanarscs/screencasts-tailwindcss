@@ -14,7 +14,7 @@ export default function index() {
 
   return (
     <DefaultLayoutComponent>
-      <input className="w-full rounded-md px-2 py-3 mb-4 bg-gray-200"type="text" placeholder="Buscar Parlamentar" value={name} onChange={(e) => setName(e.target.value)}/>
+      <input className="w-full rounded-md p-3 mb-4 bg-gray-300 border-0"type="text" placeholder="Buscar Parlamentar" value={name} onChange={(e) => setName(e.target.value)}/>
       {isLoading 
         ?(
           <div className="w-full flex flex-col justify-center items-center">
@@ -29,7 +29,7 @@ export default function index() {
             <div className="grid grid-cols-5 gap-4">
               {data?.representatives.map(rep => (
               <NextLink href={`/representatives/${rep.id}`} passHref key={rep.id}>
-                <div className="flex flex-col justify-between w-full items-center bg-white rounded-md p-2 cursor-pointer">
+                <div className="bg-white rounded-md pt-4 pb-10 px-2 flex flex-col justify-center items-center cursor-pointer hover:-translate-y-1.5 transform transition">
                   <img src={rep.urlFoto} alt={rep.nome} className="h-32 w-32 rounded-full"/>
                   <strong>{rep.nome}</strong>
                   <small>{rep.siglaPartido} - {rep.siglaUf}</small>
