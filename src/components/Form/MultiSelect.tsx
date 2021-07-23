@@ -31,13 +31,13 @@ const themeProps = (theme: Theme): Theme => {
   };
 };
 
-export function MultiSelect({name, label, options, control, ...rest}) {
+export function MultiSelect({name, label, options, control,  placeholder, ...rest}) {
   return (
-    <div>
+    <div className="w-full">
       <label htmlFor={name} className="text-gray-600 tracking-wide">{label}</label>
       <Controller 
         render={
-          ({ field }) => <ReactSelect {...field} theme={themeProps} options={options} isMulti={true} placeholder="Selecione as siglas"/>
+          ({ field }) => <ReactSelect {...field} theme={themeProps} options={options} isMulti={true} placeholder={placeholder}/>
         }
         control={control}
         name={name}

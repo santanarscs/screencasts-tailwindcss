@@ -1,13 +1,13 @@
 import { Menu, Transition } from '@headlessui/react'
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
-import { api } from '../../../services/api';
+import { api } from '../../../../services/api';
 import { useMutation, useQuery } from 'react-query';
-import { queryClient } from '../../../services/queryClient';
+import { queryClient } from '../../../../services/queryClient';
 import { Fragment, useState } from 'react';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { withSSRAuth } from '../../../utils/withSSRAuth';
-import { DefaultLayoutComponent } from '../../../components/DefaultLayout';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { withSSRAuth } from '../../../../utils/withSSRAuth';
+import { DefaultLayoutComponent } from '../../../../components/DefaultLayout';
 import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon, ClockIcon } from '@heroicons/react/outline'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
