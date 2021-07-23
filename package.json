@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3003",
     "server": "json-server -d 750 -w -p 3333 ./server.js"
   },
   "dependencies": {
@@ -17,7 +17,9 @@
     "apexcharts": "^3.27.1",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
+    "https-proxy-agent": "^5.0.0",
     "keycloak-js": "10.0.0",
+    "net": "^1.0.2",
     "next": "10.2.3",
     "next-auth": "^3.27.2",
     "react": "17.0.2",
@@ -28,6 +30,7 @@
     "react-query": "^3.17.0",
     "react-select": "^4.3.1",
     "react-use": "^17.2.4",
+    "tls": "^0.0.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {

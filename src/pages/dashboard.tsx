@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { DefaultLayoutComponent } from "../components/DefaultLayout";
 import { withSSRAuth } from "../utils/withSSRAuth";
-import { getProviders, getSession } from "next-auth/client"
+import { getSession } from "next-auth/client"
 export default function Dashboard({user}) {
   return (
     <DefaultLayoutComponent>
