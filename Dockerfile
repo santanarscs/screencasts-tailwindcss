@@ -25,17 +25,15 @@ FROM node:14-alpine AS runner
 WORKDIR /app
 
 
-
 # Environments 
 ENV NODE_ENV production
-ENV KEYCLOAK_BASE_URL=http://10.22.20.208:8190/auth/realms/CIGEO/protocol/openid-connect
-ENV KEYCLOAK_CLIENT_SECRET=*
-ENV NEXTAUTH_URL=http://localhost:3003
+
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
 # You only need to copy next.config.js if you are NOT using the default configuration
 # COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/.env.production ./
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
@@ -43,7 +41,7 @@ COPY --from=builder /app/package.json ./package.json
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 3003
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
