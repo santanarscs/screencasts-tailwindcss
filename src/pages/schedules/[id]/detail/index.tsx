@@ -8,7 +8,7 @@ import { Fragment, useState } from 'react';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { withSSRAuth } from '../../../../utils/withSSRAuth';
 import { DefaultLayoutComponent } from '../../../../components/DefaultLayout';
-import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon, ClockIcon } from '@heroicons/react/outline'
+import { PencilAltIcon, CogIcon, CheckIcon, TrashIcon, XIcon, ClockIcon, UserIcon } from '@heroicons/react/outline'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
 
@@ -309,11 +309,16 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
       <div className="absolute z-0 w-2 h-full bg-white shadow-md inset-0 left-17 md:mx-auto md:right-0 md:left-0" ></div>
       {jobsData.map((job, index) => (
         <div key={job.id} className="relative z-10">
-          <img
-              src="/images/timer2.png"
-              alt=""
-              className="timeline-img"
-          />
+          {job.origin === 'schedule' ? (
+            <div className="timeline-img flex items-center justify-center h-24 w-24 bg-yellow-100 rounded-full">
+              <ClockIcon className="h-16 w-16  text-yellow-500" />
+            </div>
+          ) : (
+            <div className="timeline-img flex items-center justify-center h-24 w-24 bg-blue-100 rounded-full">
+              <UserIcon className="h-16 w-16  text-blue-500" />
+            </div>
+          )}
+          
           <div className={(index % 2) === 0  ? `timeline-container` : 'timeline-container timeline-container-left'}>
             <div className={(index % 2) === 0 ? `timeline-pointer` : 'timeline-pointer timeline-pointer-left'} aria-hidden="true"></div>
             <div onClick={() => handleDetailJob(job.id)} className="bg-white p-6 rounded-md shadow-md cursor-pointer hover:shadow-xl transform transition">
