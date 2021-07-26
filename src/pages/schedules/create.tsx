@@ -104,7 +104,7 @@ export default function CreateSchedule() {
   }
 
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Novo Agendamento">
       <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
         <div className="flex justify-between w-full items-center mb-8 ">
           <h1 className="text-2xl font-normal text-gray-600">
@@ -114,7 +114,7 @@ export default function CreateSchedule() {
         <form className="flex flex-1 flex-col space-y-3" >
           <Input name="name" label="Nome" error={errors.name} {...register('name')} />
           <Select name="type_schedule" label="Tipo" placeholder="Selecione o tipo" {...register('type_schedule')} error={errors.type_schedule} control={control} options={options} />
-          <MultiSelect name="type_proposition" label="Siglas" control={control} {...register('type_proposition')} options={optionsPropositions} />
+          <MultiSelect name="type_proposition" label="Siglas" placeholder="Selecione uma sigla" control={control} {...register('type_proposition')} options={optionsPropositions} />
           <InputTags name="tags" label="Termos" tags={tags} handleAddTag={handleAddTag} handleRemoveTag={handleRemoveTag} />
           <button type="button" onClick={handleSubmit(handleCreateSchedule)} className="btn btn-primary">Salvar</button>
         </form>

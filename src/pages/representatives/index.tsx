@@ -13,7 +13,7 @@ export default function index() {
   const { data, isLoading } = useRepresentative(page, name)
 
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Parlamentares">
       <input className="w-full rounded-md p-3 mb-4 bg-gray-300 border-0"type="text" placeholder="Buscar Parlamentar" value={name} onChange={(e) => setName(e.target.value)}/>
       {isLoading 
         ?(

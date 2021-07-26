@@ -31,7 +31,7 @@ export default function ScheduleList({schedules, owner_id}: ScheduleListProps) {
   }
 
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Agendamentos">
       <div className="grid grid-cols-4 gap-8 ">
         <NextLink href="/schedules/create" passHref>
           <div className="bg-transparent border-4 border-dashed border-blue-400 text-blue-400 rounded-md pt-4 pb-10 lg:pt-2 lg:pb-6 px-2 flex flex-col justify-center items-center cursor-pointer hover:-translate-y-1.5 hover:border-opacity-75 hover:text-opacity-75 transform transition">

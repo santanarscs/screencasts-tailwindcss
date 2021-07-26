@@ -94,7 +94,7 @@ export default function JobDetail({ job, status, types_propositions, authors }) 
 
   if(!job.items.length) {
     return (
-      <DefaultLayoutComponent>
+      <DefaultLayoutComponent title="Detalhes do Trabalho">
         <div className="flex flex-1 flex-col  text-gray-600">
           <h1 className="text-2xl font-normal mb-3">Trabalho realizado em: {job.date_job}</h1>
           <img className="h-28" src="/images/no_data.svg" alt="No data"/>
@@ -105,7 +105,7 @@ export default function JobDetail({ job, status, types_propositions, authors }) 
   }
 
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Detalhes do Trabalho">
       <div className="flex flex-1 flex-col  text-gray-600">
         <h1 className="text-2xl font-normal mb-3">Trabalho realizado em: {job.date_job}</h1>
         <JobCongressSearchBox status={status} types_propositions={types_propositions} authors={authors} filterJobs={handleFilterJobs} reportJobs={handleReportJob} />

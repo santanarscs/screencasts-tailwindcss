@@ -19,7 +19,7 @@ type DetailProps = {
 
 export default function Detail({ profile }: DetailProps) {
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Detalhe Parlamentar">
       <h1>{profile?.nomeCivil}</h1>
     </DefaultLayoutComponent>
   )

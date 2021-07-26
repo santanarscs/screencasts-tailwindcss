@@ -127,7 +127,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   }
 
   return (
-    <DefaultLayoutComponent>
+    <DefaultLayoutComponent title="Detalhes Agendamento">
     <div className="flex flex-1 flex-col rounded-md bg-gray-100 p-4">
       <div className="flex justify-between w-full items-center mb-8 ">
         <h1 className="text-2xl font-normal text-gray-600">
