@@ -4,6 +4,7 @@ import { DefaultLayoutComponent } from "../../components/DefaultLayout";
 import { JobCongressSearchBox } from "../../components/JobCongressSearchBox";
 import { api } from "../../services/api";
 import { withSSRAuth } from "../../utils/withSSRAuth";
+import { saveAs } from 'file-saver';
 
 type Option = {
   label: string;
@@ -80,6 +81,16 @@ export default function JobDetail({ job, status, types_propositions, authors }) 
     setJobs(finalJobs)
   }
 
+  async function handleReportJob(filterData: DataFilterJob) {
+    const response = await api.post(`/jobs/${job.id}/report`, {
+      filterData,
+    }, {
+      responseType: 'blob'
+    })
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    saveAs(url, `Relatorio_camara_deputados-${job.date_job.replaceAll(' ', '_')}.pdf`);
+  }
+
 
   if(!job.items.length) {
     return (
@@ -97,9 +108,9 @@ export default function JobDetail({ job, status, types_propositions, authors }) 
     <DefaultLayoutComponent>
       <div className="flex flex-1 flex-col  text-gray-600">
         <h1 className="text-2xl font-normal mb-3">Trabalho realizado em: {job.date_job}</h1>
-        <JobCongressSearchBox status={status} types_propositions={types_propositions} authors={authors} filterJobs={handleFilterJobs} />
+        <JobCongressSearchBox status={status} types_propositions={types_propositions} authors={authors} filterJobs={handleFilterJobs} reportJobs={handleReportJob} />
         <div className=" flex flex-row-reverse my-3">
-          <span className="bg-indigo-500 p-2 text-white text-xs rounded-md">Total de propostas: {jobs.length}</span>
+          <span className="bg-indigo-200 p-2 text-indigo-700 text-xs rounded-md">Total de propostas: {jobs.length}</span>
         </div>
           <table className="min-w-full divide-y divide-gray-200 ">
           <thead className="bg-gray-50">

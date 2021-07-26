@@ -18,13 +18,18 @@ type JobCongressSearchBoxProps = {
   types_propositions: Option[]
   authors: Option[]
   filterJobs: (data: FilterJobsFormData) => void
+  reportJobs: (data: FilterJobsFormData) => void
 }
 
 
-function JobCongressSearchBox({status, types_propositions, authors, filterJobs}:JobCongressSearchBoxProps) {
+function JobCongressSearchBox({status, types_propositions, authors, filterJobs, reportJobs}:JobCongressSearchBoxProps) {
   const { register, control, handleSubmit, formState } = useForm()
   const handleFilterJobs: SubmitHandler<FilterJobsFormData> = (values) => {
     filterJobs(values)
+  }
+
+  const handleReportJobs: SubmitHandler<FilterJobsFormData> = (values) => {
+    reportJobs(values)
   }
   return (
     <div className="bg-white rounded-md p-4 shadow-sm">
@@ -38,7 +43,7 @@ function JobCongressSearchBox({status, types_propositions, authors, filterJobs}:
           <MultiSelect name="author" label="Autores" placeholder="Selecione autores" control={control} {...register('author')} options={authors} />
         </div>
         <div className="flex justify-end space-x-2 ">
-          <button type="button" className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-opacity-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">Exportar</button>
+          <button type="button" onClick={handleSubmit(handleReportJobs)} className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-opacity-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">Exportar</button>
           <button type="submit" className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-brand rounded-md hover:bg-opacity-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">Filtrar</button>
         </div>
       </form>
