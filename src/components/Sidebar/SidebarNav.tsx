@@ -8,7 +8,7 @@ export function SidebarNav() {
       <NavSection title="GERAL">
         <NavLink icon={HomeIcon} href="/dashboard">Dashboard</NavLink>
         <NavLink icon={UserIcon} href="/representatives">Parlamentares</NavLink>
-        <NavLink icon={DocumentIcon} href="/propostas">Propostas</NavLink>
+        {/* <NavLink icon={DocumentIcon} href="/propostas">Propostas</NavLink> */}
       </NavSection>
       <NavSection title="AUTOMAÇÃO">
         <NavLink icon={CalendarIcon} href="/schedules">Agendamento</NavLink>
