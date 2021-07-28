@@ -10,7 +10,7 @@ export function Sidebar() {
 
   return (
     <aside className="w-64">
-      <Profile showProfileData={true} />
+      {/* <Profile showProfileData={true} /> */}
       <SidebarNav />
     </aside>
   )

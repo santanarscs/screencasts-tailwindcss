@@ -5,7 +5,7 @@ import { getSession } from "next-auth/client"
 export default function Dashboard({user}) {
   return (
     <DefaultLayoutComponent title="Dashboard">
-      <div className="bg-gradient-to-r to-green-400 from-brand p-6 rounded-md shadow-sm flex justify-between relative h-52">
+      <div className="bg-gradient-to-r to-green-400 from-brand p-6 rounded-md shadow-sm flex justify-between relative h-52 mt-8">
         <div className="self-center">
           <h1 className="text-2xl text-white">Bem-vindo, {user.given_name}</h1>
           <p className="text-white leading-snug">Crie agendamentos e monitore seus interesses.</p>
