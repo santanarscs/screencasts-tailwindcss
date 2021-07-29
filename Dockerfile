@@ -27,6 +27,7 @@ WORKDIR /app
 
 # Environments 
 ENV NODE_ENV production
+ENV TZ America/Sao_Paulo
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
