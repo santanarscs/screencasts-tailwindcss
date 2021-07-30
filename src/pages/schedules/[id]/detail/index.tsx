@@ -55,6 +55,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   const router = useRouter()
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const [isLoadingJob, setIsLoadingJob] = useState<boolean>(false)
 
   async function fetchJobs() {
     if(schedule.id) {
@@ -72,7 +73,7 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
     }
     return []
   }
-  const {data: jobsData, isLoading, error, refetch } = useQuery('jobs', fetchJobs, {
+  const {data: jobsData, refetch } = useQuery('jobs', fetchJobs, {
     initialData: jobs
   })
  
@@ -114,10 +115,12 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
   }
 
   async function handleRunJob() {
+    setIsLoadingJob(true)
     await api.post('/jobs/run',  {
       schedule_id: schedule.id
     })
     await refetch()
+    setIsLoadingJob(false)
   }
 
 
@@ -307,6 +310,20 @@ export default function DetailSchedule({schedule, jobs}: ScheduleDetailProps) {
     </div>
     <div className="relative container mx-auto px-6 flex flex-col space-y-8">
       <div className="absolute z-0 w-2 h-full bg-white shadow-md inset-0 left-17 md:mx-auto md:right-0 md:left-0" ></div>
+      {isLoadingJob && (
+        <div  className="relative z-10 ">
+          <div className="timeline-img flex items-center justify-center h-24 w-24 bg-blue-100 rounded-full">
+            <ClockIcon className="h-16 w-16  text-blue-500" />
+          </div>
+          <div className='timeline-container'>
+            <div className='timeline-pointer' aria-hidden="true"></div>
+            <div className="bg-white p-6 rounded-md shadow-md cursor-pointer hover:shadow-xl transform transition h-24">
+              <span className="font-bold text-brand text-sm tracking-wide">Carregando...</span>
+              <p className="pt-1"></p>
+            </div>
+          </div>
+        </div>
+      )}
       {jobsData.map((job, index) => (
         <div key={job.id} className="relative z-10">
           {job.origin === 'schedule' ? (
