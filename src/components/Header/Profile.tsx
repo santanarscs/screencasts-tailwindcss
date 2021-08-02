@@ -7,7 +7,7 @@ interface ProfileProps {
 export function Profile({showProfileData}: ProfileProps) {
   const [session] = useSession()
   return (
-    <div className="flex items-center  py-4  mb-4 mr-4">
+    <div className="flex items-center ">
       {showProfileData && (
         <div className="mr-2 text-left">
           <h2>{session?.name}</h2>
