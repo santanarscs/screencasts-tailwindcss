@@ -1,6 +1,6 @@
 import { NavLink } from "./NavLink";
 import { NavSection } from "./NavSection";
-import { CalendarIcon, DocumentIcon, HomeIcon, UserIcon } from '@heroicons/react/outline'
+import { CalendarIcon, PaperClipIcon, HomeIcon, UserIcon } from '@heroicons/react/outline'
 
 export function SidebarNav() {
   return (
@@ -12,6 +12,9 @@ export function SidebarNav() {
       </NavSection>
       <NavSection title="AUTOMAÇÃO">
         <NavLink icon={CalendarIcon} href="/schedules">Agendamento</NavLink>
+      </NavSection>
+      <NavSection title="DOCUMENTAÇÃO">
+        <NavLink icon={PaperClipIcon} href="/about">Sobre</NavLink>
       </NavSection>
     </div>
   )
